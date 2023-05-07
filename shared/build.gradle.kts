@@ -3,6 +3,7 @@ plugins {
     kotlin("native.cocoapods")
     id("com.android.library")
     id("org.jetbrains.compose")
+    id("kotlin-parcelize")
 }
 
 kotlin {
@@ -11,6 +12,8 @@ kotlin {
     iosX64()
     iosArm64()
     iosSimulatorArm64()
+
+    val decompose = "2.0.0-alpha-02"
 
     cocoapods {
         version = "1.0.0"
@@ -21,6 +24,9 @@ kotlin {
         framework {
             baseName = "shared"
             isStatic = true
+
+            export("com.arkivanov.decompose:decompose:$decompose")
+            export("com.arkivanov.essenty:lifecycle:1.1.0")
         }
         extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
     }
@@ -33,6 +39,20 @@ kotlin {
                 implementation(compose.material)
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
+
+                val mviKotlin = "3.2.0"
+                implementation("com.arkivanov.mvikotlin:mvikotlin:$mviKotlin")
+                implementation("com.arkivanov.mvikotlin:mvikotlin-main:$mviKotlin")
+                implementation("com.arkivanov.mvikotlin:mvikotlin-logging:$mviKotlin")
+                implementation("com.arkivanov.mvikotlin:mvikotlin-extensions-coroutines:$mviKotlin")
+
+                implementation("com.arkivanov.decompose:decompose:$decompose")
+                implementation("com.arkivanov.decompose:extensions-compose-jetbrains:2.0.0-compose-experimental-alpha-02")
+
+                val ktor = "2.3.0"
+                implementation("io.ktor:ktor-client-core:$ktor")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor")
+                implementation("io.ktor:ktor-client-content-negotiation:$ktor")
             }
         }
         val androidMain by getting {
@@ -47,6 +67,10 @@ kotlin {
         val iosSimulatorArm64Main by getting
         val iosMain by creating {
             dependsOn(commonMain)
+            dependencies {
+                api("com.arkivanov.decompose:decompose:$decompose")
+//                api("com.arkivanov.decompose:extensions-compose-jetbrains:2.0.0-compose-experimental-alpha-02")
+            }
             iosX64Main.dependsOn(this)
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)

@@ -3,8 +3,12 @@ import SwiftUI
 import shared
 
 struct ComposeView: UIViewControllerRepresentable {
+    
+    @UIApplicationDelegateAdaptor(AppDelegate.self)
+    var appDelegate: AppDelegate
+    
     func makeUIViewController(context: Context) -> UIViewController {
-        Main_iosKt.MainViewController()
+        Main_iosKt.MainViewController(rootComponent: appDelegate.lifecycleManager.root)
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}

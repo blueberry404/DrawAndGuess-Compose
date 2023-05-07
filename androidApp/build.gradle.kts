@@ -36,3 +36,8 @@ android {
         jvmToolchain(11)
     }
 }
+
+dependencies {
+    implementation("com.arkivanov.decompose:decompose:2.0.0-alpha-02")
+    implementation("com.arkivanov.decompose:extensions-compose-jetbrains:2.0.0-compose-experimental-alpha-02")
+}
