@@ -13,15 +13,15 @@ import shared
 class LifecycleManager: NSObject, ObservableObject {
     let lifecycle: LifecycleRegistry
     let root: DAGRootComponent
-    
+
     override init() {
         lifecycle = LifecycleRegistryKt.LifecycleRegistry()
-        
+                    
         root = DefaultDAGRootComponent(
-            componentContext: DecomposeDefaultComponentContext(lifecycle: lifecycle))
+            componentContext: DefaultComponentContext(lifecycle: lifecycle))
         LifecycleRegistryExtKt.create(lifecycle)
     }
-    
+
     deinit {
         LifecycleRegistryExtKt.destroy(lifecycle)
     }

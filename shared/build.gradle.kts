@@ -25,8 +25,11 @@ kotlin {
             baseName = "shared"
             isStatic = true
 
-            export("com.arkivanov.decompose:decompose:$decompose")
+            export("com.arkivanov.decompose:decompose:2.0.0-compose-experimental-alpha-02")
             export("com.arkivanov.essenty:lifecycle:1.1.0")
+            export("com.arkivanov.essenty:state-keeper:1.1.0")
+            export("com.arkivanov.essenty:instance-keeper:1.1.0")
+            export("com.arkivanov.essenty:back-handler:1.1.0")
         }
         extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
     }
@@ -46,8 +49,12 @@ kotlin {
                 implementation("com.arkivanov.mvikotlin:mvikotlin-logging:$mviKotlin")
                 implementation("com.arkivanov.mvikotlin:mvikotlin-extensions-coroutines:$mviKotlin")
 
-                implementation("com.arkivanov.decompose:decompose:$decompose")
-                implementation("com.arkivanov.decompose:extensions-compose-jetbrains:2.0.0-compose-experimental-alpha-02")
+                api("com.arkivanov.decompose:decompose:2.0.0-compose-experimental-alpha-02")
+                api("com.arkivanov.decompose:extensions-compose-jetbrains:2.0.0-compose-experimental-alpha-02")
+                api("com.arkivanov.essenty:lifecycle:1.1.0")
+                api("com.arkivanov.essenty:state-keeper:1.1.0")
+                api("com.arkivanov.essenty:instance-keeper:1.1.0")
+                api("com.arkivanov.essenty:back-handler:1.1.0")
 
                 val ktor = "2.3.0"
                 implementation("io.ktor:ktor-client-core:$ktor")
@@ -67,10 +74,6 @@ kotlin {
         val iosSimulatorArm64Main by getting
         val iosMain by creating {
             dependsOn(commonMain)
-            dependencies {
-                api("com.arkivanov.decompose:decompose:$decompose")
-//                api("com.arkivanov.decompose:extensions-compose-jetbrains:2.0.0-compose-experimental-alpha-02")
-            }
             iosX64Main.dependsOn(this)
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
