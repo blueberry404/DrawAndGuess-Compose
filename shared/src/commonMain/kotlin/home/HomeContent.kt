@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,8 +31,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.ContentScale.Companion
 import androidx.compose.ui.unit.dp
+import extension.bounceClick
 import extension.toPx
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -100,7 +99,7 @@ fun GameOptionsSection() {
 @Composable
 fun GameOptionsCard1() {
     Box(
-        modifier = Modifier.padding(32.dp).background(
+        modifier = Modifier.bounceClick().padding(32.dp).background(
             brush = Brush.verticalGradient(
                 listOf(
                     Color(8, 239, 255), //#08EFFF
@@ -119,16 +118,22 @@ fun GameOptionsCard1() {
                 modifier = Modifier.width(120.dp).aspectRatio(1.0f).align(Alignment.TopStart)
                     .offset(y = (-40).dp, x = 16.dp),
             )
-            Column(modifier = Modifier.align(Alignment.Center).absoluteOffset(x = 116.dp)) {
-                Text(
-                    text = "Turn Based 1 on 1", style = MaterialTheme.typography.h6,
-                    color = Color(233, 234, 201)
-                ) //#E9E0C9
-                Text(
-                    text = "Exchange doodle art with a friend",
-                    style = MaterialTheme.typography.body2,
-                    color = Color(233, 234, 201)
-                )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Spacer(modifier = Modifier.weight(1f))
+                Column(
+                    modifier = Modifier.weight(2f).fillMaxWidth().padding(16.dp),
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Turn Based 1 on 1", style = MaterialTheme.typography.h6,
+                        color = Color(233, 234, 201)
+                    ) //#E9E0C9
+                    Text(
+                        text = "Exchange doodle art with a friend",
+                        style = MaterialTheme.typography.body2,
+                        color = Color(233, 234, 201)
+                    )
+                }
             }
         }
     }
@@ -137,7 +142,7 @@ fun GameOptionsCard1() {
 @Composable
 fun GameOptionsCard2() {
     Box(
-        modifier = Modifier.padding(32.dp).background(
+        modifier = Modifier.bounceClick().padding(32.dp).background(
             brush = Brush.verticalGradient(
                 listOf(
                     Color(255, 153, 211), //#FF99D3
@@ -156,16 +161,22 @@ fun GameOptionsCard2() {
                 modifier = Modifier.width(120.dp).aspectRatio(1.0f).align(Alignment.TopStart)
                     .offset(y = (-40).dp, x = 16.dp),
             )
-            Column(modifier = Modifier.align(Alignment.Center).absoluteOffset(x = 116.dp)) {
-                Text(
-                    text = "Play with Friends", style = MaterialTheme.typography.h6,
-                    color = Color(233, 234, 201)
-                )
-                Text(
-                    text = "Challenge friends for a quick match",
-                    style = MaterialTheme.typography.body2,
-                    color = Color(233, 234, 201)
-                )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Spacer(modifier = Modifier.weight(1f))
+                Column(
+                    modifier = Modifier.weight(2f).fillMaxWidth().padding(16.dp),
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Play with Friends", style = MaterialTheme.typography.h6,
+                        color = Color(233, 234, 201)
+                    )
+                    Text(
+                        text = "Challenge friends for a quick match",
+                        style = MaterialTheme.typography.body2,
+                        color = Color(233, 234, 201)
+                    )
+                }
             }
         }
     }
