@@ -8,6 +8,7 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.scale
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
 import home.HomeContent
+import root.DAGRootComponent.DAGChild.CreateRoomChild
 import root.DAGRootComponent.DAGChild.HomeChild
 
 @Composable
@@ -19,6 +20,7 @@ fun RootContent(component: DAGRootComponent, modifier: Modifier = Modifier) {
     ) {
         when (val child = it.instance) {
             is HomeChild -> HomeContent(child.component, Modifier)
+            is CreateRoomChild -> CreateRoomChild(child.component)
         }
     }
 }
