@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,6 +32,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.FontWeight.Companion
 import androidx.compose.ui.unit.dp
 import core.Colors
 import core.Images
@@ -95,6 +98,7 @@ fun GameOptionsSection() {
         GameOptionsCard1()
         Spacer(modifier = Modifier.height(36.dp))
         GameOptionsCard2()
+        JoinTeamCard()
     }
 }
 
@@ -127,7 +131,7 @@ fun GameOptionsCard1() {
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Turn Based 1 on 1", style = MaterialTheme.typography.h6,
+                        text = "Turn Based 1 on 1", style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold),
                         color = Color(Colors.PRIMARY_TEXT)
                     ) //#E9E0C9
                     Text(
@@ -170,16 +174,47 @@ fun GameOptionsCard2() {
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Play with Friends", style = MaterialTheme.typography.h6,
+                        text = "Play with Friends", style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold),
                         color = Color(Colors.PRIMARY_TEXT)
                     )
                     Text(
-                        text = "Challenge friends for a quick match",
+                        text = "Challenge upto 5 friends for a quick match",
                         style = MaterialTheme.typography.body2,
                         color = Color(Colors.PRIMARY_TEXT)
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun JoinTeamCard() {
+    Box(
+        modifier = Modifier.bounceClick().padding(32.dp).background(
+            brush = Brush.verticalGradient(
+                listOf(
+                    Color(Colors.HOME_JOIN_TEAM_GRADIENT1),
+                    Color(Colors.HOME_JOIN_TEAM_GRADIENT2),
+                )
+            ),
+            shape = RoundedCornerShape(8.dp)
+        )
+            .fillMaxWidth()
+            .defaultMinSize(minHeight = 60.dp)
+            .wrapContentHeight()
+    ) {
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center) {
+            Text(
+                text = "Have Code?", style = MaterialTheme.typography.subtitle1,
+                color = Color(Colors.PRIMARY_TEXT)
+            )
+            Text(
+                text = "Join Team",
+                style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold),
+                color = Color(Colors.PRIMARY_TEXT)
+            )
         }
     }
 }

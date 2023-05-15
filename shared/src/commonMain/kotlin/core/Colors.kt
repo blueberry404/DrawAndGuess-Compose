@@ -12,4 +12,6 @@ object Colors {
     const val HOME_HEADER_BACKGROUND = 0xff182851
     const val APP_BACKGROUND_GRADIENT1 = 0xff1c3170
     const val APP_BACKGROUND_GRADIENT2 = 0xff14153b
+    const val HOME_JOIN_TEAM_GRADIENT1 = 0xff09f5a2
+    const val HOME_JOIN_TEAM_GRADIENT2 = 0xff058c6b
 }
