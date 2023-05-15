@@ -32,8 +32,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import extension.bounceClick
-import extension.toPx
+import core.Colors
+import core.Images
+import core.animations.bounceClick
+import core.extension.toPx
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
@@ -60,7 +62,7 @@ fun HeaderContent() {
     ) {
         Card(Modifier.clip(CircleShape).size(35.dp)) {
             Image(
-                painterResource("images/man.png"),
+                painterResource(Images.PLACEHOLDER),
                 contentDescription = "Profile Image",
                 modifier = Modifier.fillMaxSize()
             )
@@ -69,7 +71,7 @@ fun HeaderContent() {
         Text(
             text = "Welcome Guest 1024!",
             style = MaterialTheme.typography.body2,
-            color = Color(233, 234, 201)
+            color = Color(Colors.PRIMARY_TEXT)
         )
     }
 }
@@ -79,7 +81,7 @@ fun HeaderContent() {
 fun GameLogo() {
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Image(
-            painterResource("images/logo.png"),
+            painterResource(Images.LOGO),
             contentDescription = "Logo",
             modifier = Modifier.wrapContentSize(),
             contentScale = ContentScale.Inside
@@ -102,9 +104,9 @@ fun GameOptionsCard1() {
         modifier = Modifier.bounceClick().padding(32.dp).background(
             brush = Brush.verticalGradient(
                 listOf(
-                    Color(8, 239, 255), //#08EFFF
-                    Color(49, 156, 255), //#319CFF
-                    Color(99, 124, 223), //#637CDF
+                    Color(Colors.HOME_CARD1_GRADIENT1),
+                    Color(Colors.HOME_CARD1_GRADIENT2),
+                    Color(Colors.HOME_CARD1_GRADIENT3),
                 )
             ),
             shape = RoundedCornerShape(8.dp)
@@ -113,7 +115,7 @@ fun GameOptionsCard1() {
     ) {
         Box(modifier = Modifier.wrapContentHeight()) {
             Image(
-                painterResource("images/onetoone.png"),
+                painterResource(Images.ONE_TO_ONE),
                 contentDescription = null,
                 modifier = Modifier.width(120.dp).aspectRatio(1.0f).align(Alignment.TopStart)
                     .offset(y = (-40).dp, x = 16.dp),
@@ -126,12 +128,12 @@ fun GameOptionsCard1() {
                 ) {
                     Text(
                         text = "Turn Based 1 on 1", style = MaterialTheme.typography.h6,
-                        color = Color(233, 234, 201)
+                        color = Color(Colors.PRIMARY_TEXT)
                     ) //#E9E0C9
                     Text(
                         text = "Exchange doodle art with a friend",
                         style = MaterialTheme.typography.body2,
-                        color = Color(233, 234, 201)
+                        color = Color(Colors.PRIMARY_TEXT)
                     )
                 }
             }
@@ -145,9 +147,9 @@ fun GameOptionsCard2() {
         modifier = Modifier.bounceClick().padding(32.dp).background(
             brush = Brush.verticalGradient(
                 listOf(
-                    Color(255, 153, 211), //#FF99D3
-                    Color(229, 105, 154), //#E5699A
-                    Color(209, 77, 110), //D14D6E
+                    Color(Colors.HOME_CARD2_GRADIENT1),
+                    Color(Colors.HOME_CARD2_GRADIENT2),
+                    Color(Colors.HOME_CARD2_GRADIENT3),
                 )
             ),
             shape = RoundedCornerShape(8.dp)
@@ -156,7 +158,7 @@ fun GameOptionsCard2() {
     ) {
         Box(modifier = Modifier.wrapContentHeight()) {
             Image(
-                painterResource("images/cup.png"),
+                painterResource(Images.CUP),
                 contentDescription = null,
                 modifier = Modifier.width(120.dp).aspectRatio(1.0f).align(Alignment.TopStart)
                     .offset(y = (-40).dp, x = 16.dp),
@@ -169,12 +171,12 @@ fun GameOptionsCard2() {
                 ) {
                     Text(
                         text = "Play with Friends", style = MaterialTheme.typography.h6,
-                        color = Color(233, 234, 201)
+                        color = Color(Colors.PRIMARY_TEXT)
                     )
                     Text(
                         text = "Challenge friends for a quick match",
                         style = MaterialTheme.typography.body2,
-                        color = Color(233, 234, 201)
+                        color = Color(Colors.PRIMARY_TEXT)
                     )
                 }
             }

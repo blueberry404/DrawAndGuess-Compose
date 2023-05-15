@@ -13,8 +13,6 @@ kotlin {
     iosArm64()
     iosSimulatorArm64()
 
-    val decompose = "2.0.0-alpha-02"
-
     cocoapods {
         version = "1.0.0"
         summary = "Some description for the Shared Module"

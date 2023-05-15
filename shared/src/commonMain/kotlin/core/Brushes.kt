@@ -1,10 +1,10 @@
-package home
+package core
 
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 fun getAppGradient() = Brush.verticalGradient(
     colors = listOf(
-        Color(28, 49, 112),
-        Color(20, 21, 59)
+        Color(Colors.APP_BACKGROUND_GRADIENT1),
+        Color(Colors.APP_BACKGROUND_GRADIENT2)
     ))

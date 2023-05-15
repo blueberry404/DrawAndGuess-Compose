@@ -4,10 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Brush.Companion
-import androidx.compose.ui.graphics.Color
-import home.getAppGradient
+import core.getAppGradient
 import root.DAGRootComponent
 import root.RootContent
 
@@ -17,7 +14,6 @@ fun App(rootComponent: DAGRootComponent) {
         Box(
             Modifier.fillMaxSize()
                 .background(brush = getAppGradient())
-//                .background(Color(229, 229, 229))
         ) {
             RootContent(rootComponent)
         }

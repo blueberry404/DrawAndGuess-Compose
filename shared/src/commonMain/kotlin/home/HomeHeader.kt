@@ -15,17 +15,18 @@ import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import core.Colors
 
 @Composable
 fun HomeHeader(modifier: Modifier, height: Float, content: @Composable () -> Unit) {
     Box(modifier.border(
-        width = 2.dp, color = Color(77, 117, 205),
+        width = 2.dp, color = Color(Colors.HOME_HEADER_BORDER),
         shape = HeaderShape(height)
     )
         .drawBehind {
             scale(0.9f) {
                 drawPath(path = headerPath(size = size, height = height),
-                color = Color(24, 40, 81))
+                color = Color(Colors.HOME_HEADER_BACKGROUND))
             }
         }
     ) { content() }

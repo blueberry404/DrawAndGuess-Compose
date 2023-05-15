@@ -1,4 +1,4 @@
-package extension
+package core.extension
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalDensity
