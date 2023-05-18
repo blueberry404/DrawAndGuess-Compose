@@ -4,6 +4,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
+import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.parcelable.Parcelable
@@ -43,7 +44,9 @@ class DefaultDAGRootComponent(
         }
 
     private fun getCreateRoomComponent(componentContext: ComponentContext) =
-        DefaultCreateRoomComponent(componentContext)
+        DefaultCreateRoomComponent(componentContext) {
+            navigation.pop()
+        }
 
     @Parcelize
     private sealed interface Config: Parcelable {

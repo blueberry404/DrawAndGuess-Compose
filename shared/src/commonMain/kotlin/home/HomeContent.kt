@@ -4,6 +4,7 @@ package home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,7 +20,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -31,14 +31,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.FontWeight.Companion
 import androidx.compose.ui.unit.dp
 import core.Colors
+import core.widgets.GameLogo
 import core.Images
 import core.animations.bounceClick
 import core.extension.toPx
+import home.GameMode.Many
+import home.GameMode.OneToOne
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
@@ -52,7 +53,7 @@ fun HomeContent(component: HomeComponent, modifier: Modifier) {
             Spacer(modifier = Modifier.height(16.dp))
             GameLogo()
             Spacer(modifier = Modifier.height(40.dp))
-            GameOptionsSection()
+            GameOptionsSection(component::onGameOptionSelected)
         }
     }
 }
@@ -79,31 +80,18 @@ fun HeaderContent() {
     }
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
-fun GameLogo() {
-    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Image(
-            painterResource(Images.LOGO),
-            contentDescription = "Logo",
-            modifier = Modifier.wrapContentSize(),
-            contentScale = ContentScale.Inside
-        )
-    }
-}
-
-@Composable
-fun GameOptionsSection() {
+fun GameOptionsSection(createRoom: (GameMode) -> Unit) {
     Column {
-        GameOptionsCard1()
+        GameOptionsCard1(createRoom)
         Spacer(modifier = Modifier.height(36.dp))
-        GameOptionsCard2()
+        GameOptionsCard2(createRoom)
         JoinTeamCard()
     }
 }
 
 @Composable
-fun GameOptionsCard1() {
+fun GameOptionsCard1(createRoom: (GameMode) -> Unit) {
     Box(
         modifier = Modifier.bounceClick().padding(32.dp).background(
             brush = Brush.verticalGradient(
@@ -115,7 +103,7 @@ fun GameOptionsCard1() {
             ),
             shape = RoundedCornerShape(8.dp)
         )
-            .fillMaxWidth()
+            .fillMaxWidth().clickable { createRoom(OneToOne) }
     ) {
         Box(modifier = Modifier.wrapContentHeight()) {
             Image(
@@ -133,7 +121,7 @@ fun GameOptionsCard1() {
                     Text(
                         text = "Turn Based 1 on 1", style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold),
                         color = Color(Colors.PRIMARY_TEXT)
-                    ) //#E9E0C9
+                    )
                     Text(
                         text = "Exchange doodle art with a friend",
                         style = MaterialTheme.typography.body2,
@@ -146,7 +134,7 @@ fun GameOptionsCard1() {
 }
 
 @Composable
-fun GameOptionsCard2() {
+fun GameOptionsCard2(createRoom: (GameMode) -> Unit) {
     Box(
         modifier = Modifier.bounceClick().padding(32.dp).background(
             brush = Brush.verticalGradient(
@@ -158,7 +146,7 @@ fun GameOptionsCard2() {
             ),
             shape = RoundedCornerShape(8.dp)
         )
-            .fillMaxWidth()
+            .fillMaxWidth().clickable { createRoom(Many) }
     ) {
         Box(modifier = Modifier.wrapContentHeight()) {
             Image(

@@ -14,4 +14,9 @@ object Colors {
     const val APP_BACKGROUND_GRADIENT2 = 0xff14153b
     const val HOME_JOIN_TEAM_GRADIENT1 = 0xff09f5a2
     const val HOME_JOIN_TEAM_GRADIENT2 = 0xff058c6b
+    const val INPUT_FIELD_BORDER = 0xff0474b9
+    const val INPUT_FIELD_BACKGROUND = 0xff1054ad
+    const val BUTTON_BACKGROUND = 0xffe3c15d
+    const val BUTTON_BORDER = 0xffe0ce09
+    const val BUTTON_BOTTOM = 0xffaba23f
 }
