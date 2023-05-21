@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +18,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +34,9 @@ import org.jetbrains.compose.resources.painterResource
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun WaitingRoomContent(component: WaitingRoomComponent, modifier: Modifier) {
+
+    val state by component.uiState.collectAsState()
+
     Column(modifier = modifier.fillMaxSize().background(brush = getAppGradient()).padding(32.dp)) {
         Row(horizontalArrangement = Arrangement.Start) {
             Image(
@@ -48,15 +52,11 @@ fun WaitingRoomContent(component: WaitingRoomComponent, modifier: Modifier) {
             Spacer(Modifier.height(16.dp))
             GameLogo()
             Spacer(Modifier.height(40.dp))
-            LobbyHeader("Test")
+            LobbyHeader(state.roomName)
             Spacer(Modifier.height(8.dp))
             WaitingRoomList(
-                Modifier.fillMaxWidth().wrapContentHeight(), listOf(
-                    WaitingUser("123", "Anum Amin"),
-                    WaitingUser("123", "Another User"),
-                    WaitingUser("123", "Abcdef Amin"),
-                    WaitingUser("123", "Bcdef Amin"),
-                )
+                Modifier.fillMaxWidth().wrapContentHeight(),
+                state.users
             )
         }
     }

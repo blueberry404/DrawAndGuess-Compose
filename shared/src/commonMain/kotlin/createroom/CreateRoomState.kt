@@ -15,4 +15,5 @@ sealed class CreateRoomIntent {
 sealed class CreateRoomAction {
     data class ShowDialog(val icon: String, val message: String, val buttonTitle: String) :
         CreateRoomAction()
+    data class ShowWaitingLobby(val roomId: String): CreateRoomAction()
 }

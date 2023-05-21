@@ -1,17 +1,27 @@
 package createroom
 
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
+import core.extension.scopeCoroutine
+import createroom.CreateRoomAction.ShowWaitingLobby
+import createroom.CreateRoomIntent.CreateRoom
+import createroom.CreateRoomIntent.OnRoomNameChanged
+import createroom.CreateRoomIntent.OnRoomPasswordChanged
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
-import createroom.CreateRoomIntent.CreateRoom
-import createroom.CreateRoomIntent.OnRoomNameChanged
-import createroom.CreateRoomIntent.OnRoomPasswordChanged
+import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
-internal class CreateRoomViewModel/*(mainContext: CoroutineContext)*/ : InstanceKeeper.Instance {
+internal class CreateRoomViewModel(
+    private val ioContext: CoroutineContext,
+) : InstanceKeeper.Instance {
 
     private var _uiState = MutableStateFlow(CreateRoomState())
     val uiState: StateFlow<CreateRoomState> = _uiState.asStateFlow()
@@ -19,8 +29,10 @@ internal class CreateRoomViewModel/*(mainContext: CoroutineContext)*/ : Instance
     private var _actions = Channel<CreateRoomAction>()
     val actions = _actions.receiveAsFlow()
 
-    override fun onDestroy() {
+    private val scope = CoroutineScope(ioContext + SupervisorJob())
 
+    override fun onDestroy() {
+        scope.cancel()
     }
 
     fun handleIntent(intent: CreateRoomIntent) {
@@ -33,16 +45,22 @@ internal class CreateRoomViewModel/*(mainContext: CoroutineContext)*/ : Instance
 
     private fun checkData() {
         if (isValid()) {
-
-        }
-        else {
+            // TODO: After API call and room creation, open lobby
+            performAction(ShowWaitingLobby("123"))
+        } else {
             // TODO: Show dialog
+        }
+    }
+
+    private fun performAction(action: CreateRoomAction) {
+        scope.launch {
+            _actions.send(action)
         }
     }
 
     private fun isValid(): Boolean {
         val state = _uiState.value
-        return with (state) {
+        return with(state) {
             roomName.length >= 8 && roomPassword.length >= 6
         }
     }
