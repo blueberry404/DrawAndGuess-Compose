@@ -3,7 +3,8 @@ package createroom
 data class CreateRoomState(
     val isLoading: Boolean = false,
     val roomName: String = "",
-    val roomPassword: String = ""
+    val roomPassword: String = "",
+    val buttonTitle: String = "",
 )
 
 sealed class CreateRoomIntent {

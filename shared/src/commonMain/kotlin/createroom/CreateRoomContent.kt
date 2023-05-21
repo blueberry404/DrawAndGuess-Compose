@@ -18,15 +18,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import core.widgets.DAGButton
-import core.widgets.GameLogo
 import core.Images
 import core.getAppGradient
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.painterResource
+import core.widgets.DAGButton
+import core.widgets.GameLogo
 import createroom.CreateRoomIntent.CreateRoom
 import createroom.CreateRoomIntent.OnRoomNameChanged
 import createroom.CreateRoomIntent.OnRoomPasswordChanged
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -59,7 +59,7 @@ fun CreateRoomContent(component: CreateRoomComponent, modifier: Modifier) {
             Spacer(Modifier.height(40.dp))
             DAGButton(
                 Modifier.width(150.dp).height(48.dp),
-                title = "Create Room"
+                title = state.buttonTitle
             ) {
                 component.onIntent(CreateRoom)
             }

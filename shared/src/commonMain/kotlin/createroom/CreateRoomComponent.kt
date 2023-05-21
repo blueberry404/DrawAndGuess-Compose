@@ -4,7 +4,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.instancekeeper.getOrCreate
 import core.extension.scopeCoroutine
 import createroom.CreateRoomAction.ShowWaitingLobby
-import kotlinx.coroutines.SupervisorJob
+import home.GameMode
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -20,12 +20,14 @@ interface CreateRoomComponent {
 class DefaultCreateRoomComponent(
     componentContext: ComponentContext,
     coroutineContext: CoroutineContext,
+    private val gameMode: GameMode,
+    private val roomMode: RoomContentMode,
     private val showWaitingLobby: (String) -> Unit,
     private val popScreen: () -> Unit,
 ): CreateRoomComponent, ComponentContext by componentContext {
 
     private val viewModel: CreateRoomViewModel = instanceKeeper.getOrCreate {
-        CreateRoomViewModel(coroutineContext)
+        CreateRoomViewModel(coroutineContext, gameMode, roomMode)
     }
     override val uiState = viewModel.uiState
 

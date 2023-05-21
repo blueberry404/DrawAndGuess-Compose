@@ -34,10 +34,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import core.Colors
-import core.widgets.GameLogo
 import core.Images
 import core.animations.bounceClick
 import core.extension.toPx
+import core.widgets.GameLogo
 import home.GameMode.Many
 import home.GameMode.OneToOne
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -53,7 +53,7 @@ fun HomeContent(component: HomeComponent, modifier: Modifier) {
             Spacer(modifier = Modifier.height(16.dp))
             GameLogo()
             Spacer(modifier = Modifier.height(40.dp))
-            GameOptionsSection(component::onGameOptionSelected)
+            GameOptionsSection(component::onGameOptionSelected, component::joinRoom)
         }
     }
 }
@@ -81,12 +81,12 @@ fun HeaderContent() {
 }
 
 @Composable
-fun GameOptionsSection(createRoom: (GameMode) -> Unit) {
+fun GameOptionsSection(createRoom: (GameMode) -> Unit, joinRoomClicked: () -> Unit) {
     Column {
         GameOptionsCard1(createRoom)
         Spacer(modifier = Modifier.height(36.dp))
         GameOptionsCard2(createRoom)
-        JoinTeamCard()
+        JoinTeamCard(joinRoomClicked)
     }
 }
 
@@ -177,7 +177,7 @@ fun GameOptionsCard2(createRoom: (GameMode) -> Unit) {
 }
 
 @Composable
-fun JoinTeamCard() {
+fun JoinTeamCard(joinRoomClicked: () -> Unit) {
     Box(
         modifier = Modifier.bounceClick().padding(32.dp).background(
             brush = Brush.verticalGradient(
@@ -191,6 +191,7 @@ fun JoinTeamCard() {
             .fillMaxWidth()
             .defaultMinSize(minHeight = 60.dp)
             .wrapContentHeight()
+            .clickable { joinRoomClicked() }
     ) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center) {

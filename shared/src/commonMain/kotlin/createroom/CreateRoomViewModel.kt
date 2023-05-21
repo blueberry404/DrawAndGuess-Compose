@@ -1,16 +1,16 @@
 package createroom
 
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
-import core.extension.scopeCoroutine
 import createroom.CreateRoomAction.ShowWaitingLobby
 import createroom.CreateRoomIntent.CreateRoom
 import createroom.CreateRoomIntent.OnRoomNameChanged
 import createroom.CreateRoomIntent.OnRoomPasswordChanged
+import createroom.RoomContentMode.Join
+import home.GameMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,9 +21,13 @@ import kotlin.coroutines.CoroutineContext
 
 internal class CreateRoomViewModel(
     private val ioContext: CoroutineContext,
+    private val gameMode: GameMode,
+    private val roomMode: RoomContentMode
 ) : InstanceKeeper.Instance {
 
-    private var _uiState = MutableStateFlow(CreateRoomState())
+    private var _uiState = MutableStateFlow(CreateRoomState(
+        buttonTitle = if (roomMode == Join) "Join Room" else "Create Room"
+    ))
     val uiState: StateFlow<CreateRoomState> = _uiState.asStateFlow()
 
     private var _actions = Channel<CreateRoomAction>()

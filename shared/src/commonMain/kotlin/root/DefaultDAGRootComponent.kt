@@ -10,7 +10,9 @@ import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import createroom.DefaultCreateRoomComponent
+import createroom.RoomContentMode
 import home.DefaultHomeComponent
+import home.GameMode
 import kotlinx.coroutines.Dispatchers
 import root.DAGRootComponent.DAGChild
 import root.DAGRootComponent.DAGChild.CreateRoomChild
@@ -37,7 +39,14 @@ class DefaultDAGRootComponent(
     private fun child(config: Config, componentContext: ComponentContext): DAGChild =
         when (config) {
             is Config.Home -> HomeChild(getHomeComponent())
-            is Config.CreateRoom -> CreateRoomChild(getCreateRoomComponent(componentContext))
+            is Config.CreateRoom -> CreateRoomChild(
+                getCreateRoomComponent(
+                    config.gameMode,
+                    config.roomMode,
+                    componentContext
+                )
+            )
+
             is Config.WaitingRoom -> WaitingRoomChild(
                 getWaitingRoomComponent(
                     config.roomId,
@@ -47,12 +56,16 @@ class DefaultDAGRootComponent(
         }
 
     private fun getHomeComponent() =
-        DefaultHomeComponent {
-            navigation.push(Config.CreateRoom)
+        DefaultHomeComponent { gameMode, roomMode ->
+            navigation.push(Config.CreateRoom(gameMode, roomMode))
         }
 
-    private fun getCreateRoomComponent(componentContext: ComponentContext) =
-        DefaultCreateRoomComponent(componentContext, Dispatchers.Main, {
+    private fun getCreateRoomComponent(
+        gameMode: GameMode,
+        roomMode: RoomContentMode,
+        componentContext: ComponentContext
+    ) =
+        DefaultCreateRoomComponent(componentContext, Dispatchers.Main, gameMode, roomMode, {
             navigation.push(Config.WaitingRoom(it))
         }) {
             navigation.pop()
@@ -66,7 +79,7 @@ class DefaultDAGRootComponent(
     @Parcelize
     private sealed interface Config : Parcelable {
         object Home : Config
-        object CreateRoom : Config
+        data class CreateRoom(val gameMode: GameMode, val roomMode: RoomContentMode) : Config
         data class WaitingRoom(val roomId: String) : Config
     }
 }
