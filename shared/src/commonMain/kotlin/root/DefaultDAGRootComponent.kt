@@ -9,11 +9,13 @@ import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
-import home.DefaultHomeComponent
 import createroom.DefaultCreateRoomComponent
+import home.DefaultHomeComponent
 import root.DAGRootComponent.DAGChild
 import root.DAGRootComponent.DAGChild.CreateRoomChild
 import root.DAGRootComponent.DAGChild.HomeChild
+import root.DAGRootComponent.DAGChild.WaitingRoomChild
+import waitingroom.DefaultWaitingRoomComponent
 
 class DefaultDAGRootComponent(
     componentContext: ComponentContext,
@@ -33,12 +35,13 @@ class DefaultDAGRootComponent(
 
     private fun child(config: Config, componentContext: ComponentContext): DAGChild =
         when (config) {
-            is Config.Home -> HomeChild(getHomeComponent(componentContext))
+            is Config.Home -> HomeChild(getHomeComponent())
             is Config.CreateRoom -> CreateRoomChild(getCreateRoomComponent(componentContext))
+            is Config.WaitingRoom -> WaitingRoomChild(getWaitingRoomComponent())
         }
 
-    private fun getHomeComponent(componentContext: ComponentContext) =
-        DefaultHomeComponent(componentContext) {
+    private fun getHomeComponent() =
+        DefaultHomeComponent {
             navigation.push(Config.CreateRoom)
         }
 
@@ -47,9 +50,14 @@ class DefaultDAGRootComponent(
             navigation.pop()
         }
 
+    private fun getWaitingRoomComponent() = DefaultWaitingRoomComponent {
+        navigation.pop()
+    }
+
     @Parcelize
     private sealed interface Config: Parcelable {
         object Home: Config
         object CreateRoom: Config
+        object WaitingRoom: Config
     }
 }

@@ -19,4 +19,5 @@ object Colors {
     const val BUTTON_BACKGROUND = 0xffe3c15d
     const val BUTTON_BORDER = 0xffe0ce09
     const val BUTTON_BOTTOM = 0xffaba23f
+    const val BACKGROUND_YELLOW = 0xffe3c15d
 }

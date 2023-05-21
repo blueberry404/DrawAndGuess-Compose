@@ -7,10 +7,12 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.scale
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
-import home.HomeContent
 import createroom.CreateRoomContent
+import home.HomeContent
 import root.DAGRootComponent.DAGChild.CreateRoomChild
 import root.DAGRootComponent.DAGChild.HomeChild
+import root.DAGRootComponent.DAGChild.WaitingRoomChild
+import waitingroom.WaitingRoomContent
 
 @Composable
 fun RootContent(component: DAGRootComponent, modifier: Modifier = Modifier) {
@@ -22,6 +24,7 @@ fun RootContent(component: DAGRootComponent, modifier: Modifier = Modifier) {
         when (val child = it.instance) {
             is HomeChild -> HomeContent(child.component, Modifier)
             is CreateRoomChild -> CreateRoomContent(child.component, Modifier)
+            is WaitingRoomChild -> WaitingRoomContent(child.component, Modifier)
         }
     }
 }
