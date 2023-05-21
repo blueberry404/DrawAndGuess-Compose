@@ -1,4 +1,4 @@
-package room
+package createroom
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,9 +24,9 @@ import core.Images
 import core.getAppGradient
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
-import room.CreateRoomIntent.CreateRoom
-import room.CreateRoomIntent.OnRoomNameChanged
-import room.CreateRoomIntent.OnRoomPasswordChanged
+import createroom.CreateRoomIntent.CreateRoom
+import createroom.CreateRoomIntent.OnRoomNameChanged
+import createroom.CreateRoomIntent.OnRoomPasswordChanged
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable

@@ -8,7 +8,7 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.scale
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
 import home.HomeContent
-import room.CreateRoomContent
+import createroom.CreateRoomContent
 import root.DAGRootComponent.DAGChild.CreateRoomChild
 import root.DAGRootComponent.DAGChild.HomeChild
 

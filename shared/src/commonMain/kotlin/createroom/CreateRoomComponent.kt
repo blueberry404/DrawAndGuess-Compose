@@ -1,4 +1,4 @@
-package room
+package createroom
 
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.instancekeeper.getOrCreate

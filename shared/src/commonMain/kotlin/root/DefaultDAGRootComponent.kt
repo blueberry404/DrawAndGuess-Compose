@@ -10,8 +10,7 @@ import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import home.DefaultHomeComponent
-import room.CreateRoomComponent
-import room.DefaultCreateRoomComponent
+import createroom.DefaultCreateRoomComponent
 import root.DAGRootComponent.DAGChild
 import root.DAGRootComponent.DAGChild.CreateRoomChild
 import root.DAGRootComponent.DAGChild.HomeChild

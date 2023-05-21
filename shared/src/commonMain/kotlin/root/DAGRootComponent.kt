@@ -3,7 +3,7 @@ package root
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.value.Value
 import home.HomeComponent
-import room.CreateRoomComponent
+import createroom.CreateRoomComponent
 
 interface DAGRootComponent {
 

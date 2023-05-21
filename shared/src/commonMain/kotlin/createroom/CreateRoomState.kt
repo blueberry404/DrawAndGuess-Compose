@@ -1,4 +1,4 @@
-package room
+package createroom
 
 data class CreateRoomState(
     val isLoading: Boolean = false,
