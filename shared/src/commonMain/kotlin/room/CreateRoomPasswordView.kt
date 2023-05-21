@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -23,7 +24,7 @@ import core.Colors
 
 
 @Composable
-fun RoomPasswordInputView(onTextChanged: (String) -> Unit) {
+fun RoomPasswordInputView(inputText: String = "", onTextChanged: (String) -> Unit) {
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
@@ -35,7 +36,7 @@ fun RoomPasswordInputView(onTextChanged: (String) -> Unit) {
             color = Color(Colors.PRIMARY_TEXT)
         )
         InputView(Modifier.fillMaxWidth().weight(1f)) {
-            RoomPasswordInput("", 10, onTextChanged)
+            RoomPasswordInput(inputText, 10, onTextChanged)
         }
     }
 }
@@ -59,5 +60,6 @@ fun RoomPasswordInput(inputText: String = "", maxChars: Int, onTextChanged: (Str
             unfocusedIndicatorColor = Color.Transparent,
         ),
         textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
+        visualTransformation = PasswordVisualTransformation()
     )
 }

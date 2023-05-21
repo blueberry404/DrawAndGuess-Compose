@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -22,10 +24,16 @@ import core.Images
 import core.getAppGradient
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import room.CreateRoomIntent.CreateRoom
+import room.CreateRoomIntent.OnRoomNameChanged
+import room.CreateRoomIntent.OnRoomPasswordChanged
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun CreateRoomContent(component: CreateRoomComponent, modifier: Modifier) {
+
+    val state by component.uiState.collectAsState()
+
     Column(modifier = modifier.fillMaxSize().background(brush = getAppGradient()).padding(32.dp)) {
         Row(horizontalArrangement = Arrangement.Start) {
             Image(
@@ -41,15 +49,19 @@ fun CreateRoomContent(component: CreateRoomComponent, modifier: Modifier) {
             Spacer(Modifier.height(16.dp))
             GameLogo()
             Spacer(Modifier.height(40.dp))
-            RoomNameInputView { }
+            RoomNameInputView(inputText = state.roomName) {
+                component.onIntent(OnRoomNameChanged(it))
+            }
             Spacer(Modifier.height(32.dp))
-            RoomPasswordInputView { }
+            RoomPasswordInputView(inputText = state.roomPassword) {
+                component.onIntent(OnRoomPasswordChanged(it))
+            }
             Spacer(Modifier.height(40.dp))
             DAGButton(
                 Modifier.width(150.dp).height(48.dp),
                 title = "Create Room"
             ) {
-
+                component.onIntent(CreateRoom)
             }
         }
     }

@@ -23,7 +23,7 @@ import core.Colors
 
 
 @Composable
-fun RoomNameInputView(onTextChanged: (String) -> Unit) {
+fun RoomNameInputView(inputText: String = "", onTextChanged: (String) -> Unit) {
     Row(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
@@ -35,7 +35,7 @@ fun RoomNameInputView(onTextChanged: (String) -> Unit) {
             color = Color(Colors.PRIMARY_TEXT)
         )
         InputView(Modifier.fillMaxWidth().weight(1f)) {
-            RoomNameInput("", 10, onTextChanged)
+            RoomNameInput(inputText, 10, onTextChanged)
         }
     }
 }
