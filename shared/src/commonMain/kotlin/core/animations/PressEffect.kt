@@ -13,17 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import core.animations.ButtonState.Idle
-import core.animations.ButtonState.Pressed
 
-fun Modifier.bounceClick() = composed {
-    var buttonState by remember { mutableStateOf(Idle) }
-    val scale by animateFloatAsState(if (buttonState == Pressed) 0.70f else 1f)
+fun Modifier.pressClickEffect() = composed {
+    var buttonState by remember { mutableStateOf(ButtonState.Idle) }
+    val ty by animateFloatAsState(if (buttonState == ButtonState.Pressed) 0f else -20f)
 
     this
         .graphicsLayer {
-            scaleX = scale
-            scaleY = scale
+            translationY = ty
         }
         .clickable(
             interactionSource = remember { MutableInteractionSource() },
@@ -32,12 +29,12 @@ fun Modifier.bounceClick() = composed {
         )
         .pointerInput(buttonState) {
             awaitPointerEventScope {
-                buttonState = if (buttonState == Pressed) {
+                buttonState = if (buttonState == ButtonState.Pressed) {
                     waitForUpOrCancellation()
-                    Idle
+                    ButtonState.Idle
                 } else {
                     awaitFirstDown(false)
-                    Pressed
+                    ButtonState.Pressed
                 }
             }
         }

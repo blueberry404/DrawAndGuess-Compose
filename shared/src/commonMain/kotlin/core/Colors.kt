@@ -30,4 +30,6 @@ object Colors {
     const val TIMER_PROGRESS = 0xff96d0da
     const val TIMER_TINT = 0xffde513c
     const val TIMER_BACKGROUND = 0xfff4f2e6
+    const val GUESS_BOX = 0xffde513c
+    const val KEYBOARD_BACKGROUND = 0x991c3170
 }

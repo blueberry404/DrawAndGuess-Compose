@@ -41,12 +41,35 @@ class GameViewModel(
     )
 
     init {
-        _uiState.value = GameState(players = listOf(
-            Player("123", "Guest123", 12, false, false, getColor()),
-            Player("123", "Guest234", 0, true, false, getColor()),
-            Player("123", "Guest345", 0, false, true, getColor()),
-        ))
-//        initTimer()
+        otherDrawing()
+    }
+
+    fun otherDrawing() {
+        _uiState.value = GameState(
+            isCurrentUser = false,
+            currentTurnUserId = "123",
+            currentUsername = "Guest 388h",
+            isDrawing = true,
+            isChoosing = false,
+            players = listOf(
+                Player("123", "Guest123", 12, false, false, getColor()),
+                Player("456", "Guest234", 0, true, false, getColor()),
+                Player("789", "Guest345", 0, false, true, getColor()),
+            ))
+    }
+
+    fun OtherChoosing() {
+        _uiState.value = GameState(
+            isCurrentUser = false,
+            currentTurnUserId = "123",
+            currentUsername = "Guest 388h",
+            isDrawing = false,
+            isChoosing = true,
+            players = listOf(
+                Player("123", "Guest123", 12, false, false, getColor()),
+                Player("456", "Guest234", 0, true, false, getColor()),
+                Player("789", "Guest345", 0, false, true, getColor()),
+            ))
     }
 
     override fun onDestroy() {
