@@ -20,4 +20,14 @@ object Colors {
     const val BUTTON_BORDER = 0xffe0ce09
     const val BUTTON_BOTTOM = 0xffaba23f
     const val BACKGROUND_YELLOW = 0xffe3c15d
+    const val AVATAR_1 = 0xff4e333e
+    const val AVATAR_2 = 0xffed174f
+    const val AVATAR_3 = 0xff746f74
+    const val AVATAR_4 = 0xff7e0c6e
+    const val AVATAR_5 = 0xff8a9a5b
+    const val AVATAR_6 = 0xffcd9a98
+    const val AVATAR_7 = 0xfff8981d
+    const val TIMER_PROGRESS = 0xff96d0da
+    const val TIMER_TINT = 0xffde513c
+    const val TIMER_BACKGROUND = 0xfff4f2e6
 }

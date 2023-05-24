@@ -8,8 +8,10 @@ import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.scale
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
 import createroom.CreateRoomContent
+import game.GameContent
 import home.HomeContent
 import root.DAGRootComponent.DAGChild.CreateRoomChild
+import root.DAGRootComponent.DAGChild.GameChild
 import root.DAGRootComponent.DAGChild.HomeChild
 import root.DAGRootComponent.DAGChild.WaitingRoomChild
 import waitingroom.WaitingRoomContent
@@ -25,6 +27,7 @@ fun RootContent(component: DAGRootComponent, modifier: Modifier = Modifier) {
             is HomeChild -> HomeContent(child.component, Modifier)
             is CreateRoomChild -> CreateRoomContent(child.component, Modifier)
             is WaitingRoomChild -> WaitingRoomContent(child.component, Modifier)
+            is GameChild -> GameContent(child.component, Modifier)
         }
     }
 }

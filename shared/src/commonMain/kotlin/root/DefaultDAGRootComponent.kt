@@ -11,11 +11,13 @@ import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import createroom.DefaultCreateRoomComponent
 import createroom.RoomContentMode
+import game.DefaultGameComponent
 import home.DefaultHomeComponent
 import home.GameMode
 import kotlinx.coroutines.Dispatchers
 import root.DAGRootComponent.DAGChild
 import root.DAGRootComponent.DAGChild.CreateRoomChild
+import root.DAGRootComponent.DAGChild.GameChild
 import root.DAGRootComponent.DAGChild.HomeChild
 import root.DAGRootComponent.DAGChild.WaitingRoomChild
 import waitingroom.DefaultWaitingRoomComponent
@@ -46,18 +48,19 @@ class DefaultDAGRootComponent(
                     componentContext
                 )
             )
-
             is Config.WaitingRoom -> WaitingRoomChild(
                 getWaitingRoomComponent(
                     config.roomId,
                     componentContext
                 )
             )
+            is Config.Game -> GameChild(getGameComponent(config.roomId, componentContext))
         }
 
     private fun getHomeComponent() =
         DefaultHomeComponent { gameMode, roomMode ->
-            navigation.push(Config.CreateRoom(gameMode, roomMode))
+//            navigation.push(Config.CreateRoom(gameMode, roomMode))
+            navigation.push(Config.Game("123"))
         }
 
     private fun getCreateRoomComponent(
@@ -76,10 +79,14 @@ class DefaultDAGRootComponent(
             navigation.pop()
         }
 
+    private fun getGameComponent(roomId: String, componentContext: ComponentContext) =
+        DefaultGameComponent(componentContext, Dispatchers.Main)
+
     @Parcelize
     private sealed interface Config : Parcelable {
         object Home : Config
         data class CreateRoom(val gameMode: GameMode, val roomMode: RoomContentMode) : Config
         data class WaitingRoom(val roomId: String) : Config
+        data class Game(val roomId: String): Config
     }
 }
