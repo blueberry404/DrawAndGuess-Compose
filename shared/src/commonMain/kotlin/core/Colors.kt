@@ -32,4 +32,9 @@ object Colors {
     const val TIMER_BACKGROUND = 0xfff4f2e6
     const val GUESS_BOX = 0xffde513c
     const val KEYBOARD_BACKGROUND = 0x991c3170
+    const val BORDER_PALETTE_COLOR = 0xffd1eaf0
+
+    const val PAINT_OLIVE = 0xff808000
+    const val PAINT_PURPLE = 0xff800080
+    const val PAINT_ORANGE = 0xffFFA500
 }

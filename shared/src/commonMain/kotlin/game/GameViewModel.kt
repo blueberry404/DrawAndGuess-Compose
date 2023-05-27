@@ -46,7 +46,7 @@ class GameViewModel(
 
     fun otherDrawing() {
         _uiState.value = GameState(
-            isCurrentUser = false,
+            isCurrentUser = true,
             currentTurnUserId = "123",
             currentUsername = "Guest 388h",
             isDrawing = true,

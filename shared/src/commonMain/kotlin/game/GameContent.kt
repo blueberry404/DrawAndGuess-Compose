@@ -23,7 +23,7 @@ import home.HomeHeader
 fun GameContent(component: GameComponent, modifier: Modifier) {
     val state by component.uiState.collectAsState()
     Box(modifier.fillMaxSize()) {
-        if (state.isOtherUserDrawing) {
+        if (state.isDrawing) {
             HomeHeader(modifier.fillMaxWidth().height(60.dp).zIndex(2f), 60.dp.toPx()) {
                 GameHeader(state = state)
             }
