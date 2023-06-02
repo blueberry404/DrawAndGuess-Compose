@@ -8,6 +8,8 @@ import kotlin.coroutines.CoroutineContext
 interface GameComponent {
 
     val uiState: StateFlow<GameState>
+
+    fun onIntent(intent: GameIntent)
 }
 
 class DefaultGameComponent(
@@ -20,4 +22,8 @@ class DefaultGameComponent(
     }
     override val uiState: StateFlow<GameState>
         get() = viewModel.uiState
+
+    override fun onIntent(intent: GameIntent) {
+        viewModel.handleIntent(intent)
+    }
 }

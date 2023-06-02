@@ -1,8 +1,13 @@
 package game
 
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import core.Colors
+import game.GameIntent.OnDragMoved
+import game.GameIntent.OnDragStarted
+import game.GameIntent.SelectLetter
+import game.GameIntent.WiggleAnimationCompleted
 import home.Player
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
@@ -40,13 +45,56 @@ class GameViewModel(
         Color(Colors.AVATAR_7),
     )
 
+    private val drawingInfo: MutableList<MutableList<Offset>> = mutableListOf()
+
     init {
         otherDrawing()
     }
 
+    fun handleIntent(intent: GameIntent) {
+        when (intent) {
+            is SelectLetter -> checkGuessedWord(intent.letter)
+            OnDragStarted -> drawingInfo.add(mutableListOf())
+            is OnDragMoved -> drawingInfo.last().add(intent.offset)
+            WiggleAnimationCompleted -> _uiState.update { it.copy(
+                word = GameWord(actual = it.word.actual)
+            ) }
+        }
+    }
+
+    private fun checkGuessedWord(letter: Char) {
+        val word = _uiState.value.word
+        if (letter == '!' && word.guessed.isEmpty()) return
+        if (letter == '!') { //backspace
+            val guessed = word.guessed.substring(0, word.guessed.length - 1)
+            _uiState.update { it.copy(word = GameWord(word.actual, guessed)) }
+            return
+        }
+        val guessed = word.guessed + letter
+        if (word.actual.length > guessed.length) {
+            _uiState.update { it.copy(word = GameWord(word.actual, guessed)) }
+        }
+        else if (isCorrectGuess(word.actual, guessed)) {
+            // inform server
+            _uiState.update { it.copy(word = GameWord(word.actual, guessed)) }
+            println("WON!!!!")
+        }
+        else if(isWrongGuess(word.actual, guessed)) {
+            _uiState.update { it.copy(word = word.copy(guessed = guessed, wiggle = true)) }
+            println("OOPSS!!!")
+        }
+    }
+
+    private fun isCorrectGuess(actual: String, guessed: String) =
+        actual.length == guessed.length && actual.lowercase() == guessed.lowercase()
+
+    private fun isWrongGuess(actual: String, guessed: String) =
+        actual.length == guessed.length && actual.lowercase() != guessed.lowercase()
+
+
     fun otherDrawing() {
         _uiState.value = GameState(
-            isCurrentUser = true,
+            isCurrentUser = false,
             currentTurnUserId = "123",
             currentUsername = "Guest 388h",
             isDrawing = true,
@@ -55,7 +103,9 @@ class GameViewModel(
                 Player("123", "Guest123", 12, false, false, getColor()),
                 Player("456", "Guest234", 0, true, false, getColor()),
                 Player("789", "Guest345", 0, false, true, getColor()),
-            ))
+            ),
+        word = GameWord("Water")
+        )
     }
 
     fun OtherChoosing() {

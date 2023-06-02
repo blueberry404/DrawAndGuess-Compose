@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import core.Colors
 import core.extension.toPx
+import game.GameIntent.SelectLetter
+import game.GameIntent.WiggleAnimationCompleted
 import home.HomeHeader
 
 @Composable
@@ -29,7 +31,11 @@ fun GameContent(component: GameComponent, modifier: Modifier) {
             }
             Column(Modifier.zIndex(-1f)) {
                 Spacer(Modifier.height(45.dp))
-                GameBodyContent(Modifier.fillMaxSize(), state)
+                GameBodyContent(Modifier.fillMaxSize(), state, onKeyPressed = {
+                    component.onIntent(SelectLetter(it))
+                }, onAnimationCompleted = {
+                    component.onIntent(WiggleAnimationCompleted)
+                })
             }
         }
         else {
@@ -38,7 +44,11 @@ fun GameContent(component: GameComponent, modifier: Modifier) {
                     GameHeader(state = state)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                GameBodyContent(Modifier.fillMaxSize(), state)
+                GameBodyContent(Modifier.fillMaxSize(), state, onKeyPressed = {
+                    component.onIntent(SelectLetter(it))
+                }, onAnimationCompleted = {
+                    component.onIntent(WiggleAnimationCompleted)
+                })
             }
         }
     }

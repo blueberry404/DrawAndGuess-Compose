@@ -1,5 +1,6 @@
 package game
 
+import androidx.compose.ui.geometry.Offset
 import home.Player
 
 data class GameState(
@@ -9,11 +10,11 @@ data class GameState(
     val currentUsername: String = "",
     val isDrawing: Boolean = false,
     val isChoosing: Boolean = false,
-    val word: String = "",
     val totalRounds: Int = 0,
     val currentRound: Int = 0,
     val totalTimeInSec: Int = 20,
     val currentTime: Int = 0,
+    val word: GameWord = GameWord(),
 ) {
     val isCurrentUserChoosing = isCurrentUser && isChoosing
     val isOtherUserChoosing = !isCurrentUser && isChoosing
@@ -21,6 +22,11 @@ data class GameState(
     val isOtherUserDrawing = !isCurrentUser && isDrawing
 }
 
-sealed class GameIntent {
+data class GameWord(val actual: String = "", val guessed: String = "", val wiggle: Boolean = false)
 
+sealed class GameIntent {
+    data class SelectLetter(val letter: Char): GameIntent()
+    object OnDragStarted: GameIntent()
+    data class OnDragMoved(val offset: Offset): GameIntent()
+    object WiggleAnimationCompleted: GameIntent()
 }

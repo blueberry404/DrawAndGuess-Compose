@@ -1,5 +1,7 @@
 package game
 
+
+import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -8,13 +10,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CornerSize
@@ -22,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -35,17 +37,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import core.Colors
-import core.extension.toDp
-import core.extension.toPx
+import core.animations.shakeKeyframes
 
 
 @Composable
-fun GameBodyContent(modifier: Modifier = Modifier, state: GameState) =
+fun GameBodyContent(modifier: Modifier = Modifier, state: GameState, onKeyPressed: (Char) -> Unit, onAnimationCompleted: () -> Unit) =
     when {
         state.isCurrentUserChoosing -> {}
         state.isOtherUserChoosing -> GameContentOtherUserChoosing(modifier, state)
         state.isCurrentUserDrawing -> GameContentCurrentUserDrawing(modifier, state)
-        state.isOtherUserDrawing -> GameContentOtherUserDrawing(modifier, state)
+        state.isOtherUserDrawing -> GameContentOtherUserDrawing(modifier, state, onKeyPressed, onAnimationCompleted)
         else -> {}
     }
 
@@ -77,14 +78,13 @@ fun GameContentOtherUserChoosing(modifier: Modifier = Modifier, state: GameState
 }
 
 @Composable
-fun GameContentOtherUserDrawing(modifier: Modifier, state: GameState) {
+fun GameContentOtherUserDrawing(modifier: Modifier, state: GameState, onKeyPressed: (Char) -> Unit, onAnimationCompleted: () -> Unit) {
     Column(modifier) {
         DrawingCanvas(Modifier.fillMaxWidth().weight(1f), state)
-        WordBlocks(Modifier.fillMaxWidth(), "waterme", "APP")
+        WordBlocks(Modifier.fillMaxWidth(), state.word, onAnimationCompleted)
         GameKeyboard(
             Modifier.fillMaxWidth().background(Color(Colors.KEYBOARD_BACKGROUND))
-                .padding(vertical = 8.dp, horizontal = 4.dp)
-        ) {}
+                .padding(vertical = 8.dp, horizontal = 4.dp), onKeyPressed)
     }
 }
 
@@ -107,7 +107,7 @@ fun DrawingCanvas(modifier: Modifier, state: GameState) {
             if (state.isCurrentUserDrawing) {
                 it.pointerInput(Unit) {
                     detectDragGestures(onDragStart = {
-                        pointsState.add(kotlin.collections.mutableListOf())
+                        pointsState.add(mutableListOf())
 //                println("onDragStart:: $it")
                     }, onDragEnd = {
 //                println("onDragEnd::")
@@ -136,25 +136,32 @@ fun DrawingCanvas(modifier: Modifier, state: GameState) {
 }
 
 @Composable
-fun WordBlocks(modifier: Modifier, actualWord: String, guessedWord: String) {
+fun WordBlocks(modifier: Modifier, word: GameWord, onAnimationCompleted: () -> Unit) {
     BoxWithConstraints(modifier.padding(16.dp)) {
-        val maxWidth = constraints.maxWidth
-        val padding = 8.dp.toPx() * (actualWord.length - 1)
-        val blockWidth = (maxWidth - padding) / actualWord.length
-        val blockWidthInDp = blockWidth.toInt().toDp()
+        val offsetX = remember { Animatable(0f) }
 
-        LazyRow(modifier = Modifier.align(Alignment.Center)) {
-            items(actualWord.length) { index ->
+        LaunchedEffect(word.wiggle) {
+            if (word.wiggle) {
+                offsetX.animateTo(
+                    targetValue = 0f,
+                    animationSpec = shakeKeyframes,
+                )
+                onAnimationCompleted()
+            }
+        }
+
+        LazyRow(modifier = Modifier.align(Alignment.Center)
+            .offset(x = offsetX.value.dp)) {
+            items(word.actual.length) { index ->
                 Box(
                     modifier = Modifier
-                        .sizeIn(maxWidth = blockWidthInDp, maxHeight = blockWidthInDp)
-                        .aspectRatio(1f)
+                        .size(40.dp)
                         .padding(end = 4.dp)
                         .background(Color(Colors.GUESS_BOX), RoundedCornerShape(CornerSize(4.dp))),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = if (index > guessedWord.length - 1) "" else guessedWord[index].toString(),
+                        text = if (index > word.guessed.length - 1) "" else word.guessed[index].toString(),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(Colors.PRIMARY_TEXT),
