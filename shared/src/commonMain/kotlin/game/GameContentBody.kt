@@ -25,10 +25,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
@@ -38,17 +39,44 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import core.Colors
 import core.animations.shakeKeyframes
-
+import core.extension.ifOnly
 
 @Composable
-fun GameBodyContent(modifier: Modifier = Modifier, state: GameState, onKeyPressed: (Char) -> Unit, onAnimationCompleted: () -> Unit) =
+fun GameBodyContent(
+    modifier: Modifier = Modifier,
+    state: GameState,
+    onKeyPressed: (Char) -> Unit,
+    onAnimationCompleted: () -> Unit,
+    onColorSelected: (Color) -> Unit,
+    onStrokeWidthSelected: (Float) -> Unit
+) {
+    val drawingInfoState = mutableStateOf(state.drawingInfo)
+
     when {
         state.isCurrentUserChoosing -> {}
         state.isOtherUserChoosing -> GameContentOtherUserChoosing(modifier, state)
-        state.isCurrentUserDrawing -> GameContentCurrentUserDrawing(modifier, state)
-        state.isOtherUserDrawing -> GameContentOtherUserDrawing(modifier, state, onKeyPressed, onAnimationCompleted)
+        state.isCurrentUserDrawing -> GameContentCurrentUserDrawing(
+            modifier,
+            state,
+            onColorSelected = {
+                onColorSelected(it)
+            },
+            onStrokeWidthSelected = {
+                onStrokeWidthSelected(it)
+            },
+            drawingInfo = drawingInfoState.value
+        )
+
+        state.isOtherUserDrawing -> GameContentOtherUserDrawing(
+            modifier,
+            state,
+            onKeyPressed,
+            onAnimationCompleted
+        )
+
         else -> {}
     }
+}
 
 @Composable
 fun GameContentOtherUserChoosing(modifier: Modifier = Modifier, state: GameState) {
@@ -78,56 +106,69 @@ fun GameContentOtherUserChoosing(modifier: Modifier = Modifier, state: GameState
 }
 
 @Composable
-fun GameContentOtherUserDrawing(modifier: Modifier, state: GameState, onKeyPressed: (Char) -> Unit, onAnimationCompleted: () -> Unit) {
+fun GameContentOtherUserDrawing(
+    modifier: Modifier,
+    state: GameState,
+    onKeyPressed: (Char) -> Unit,
+    onAnimationCompleted: () -> Unit,
+) {
     Column(modifier) {
         DrawingCanvas(Modifier.fillMaxWidth().weight(1f), state)
         WordBlocks(Modifier.fillMaxWidth(), state.word, onAnimationCompleted)
         GameKeyboard(
             Modifier.fillMaxWidth().background(Color(Colors.KEYBOARD_BACKGROUND))
-                .padding(vertical = 8.dp, horizontal = 4.dp), onKeyPressed)
+                .padding(vertical = 8.dp, horizontal = 4.dp), onKeyPressed
+        )
     }
 }
 
 @Composable
-fun GameContentCurrentUserDrawing(modifier: Modifier, state: GameState) {
+fun GameContentCurrentUserDrawing(
+    modifier: Modifier,
+    state: GameState,
+    onColorSelected: (Color) -> Unit,
+    onStrokeWidthSelected: (Float) -> Unit,
+    drawingInfo: DrawingInfo,
+) {
     Column(modifier) {
-        DrawingCanvas(Modifier.fillMaxWidth().weight(1f), state)
-        GameToolbox(Modifier.fillMaxWidth().wrapContentHeight())
+        DrawingCanvas(Modifier.fillMaxWidth().weight(1f), state, drawingInfo)
+        GameToolbox(
+            Modifier.fillMaxWidth().wrapContentHeight(),
+            onColorSelected,
+            onStrokeWidthSelected
+        )
     }
 }
 
 @Composable
-fun DrawingCanvas(modifier: Modifier, state: GameState) {
+fun DrawingCanvas(modifier: Modifier, state: GameState, drawingInfo: DrawingInfo = DrawingInfo()) {
 
-    val pointsState = remember { mutableStateListOf<MutableList<Offset>>() }
+    val pointsState = remember { mutableStateListOf<DrawingItemInfo>() }
+    val info = rememberUpdatedState(drawingInfo)
 
     Box(modifier.background(Color.White.copy(alpha = 0.5f))
         .padding(16.dp)
-        .also {
-            if (state.isCurrentUserDrawing) {
-                it.pointerInput(Unit) {
-                    detectDragGestures(onDragStart = {
-                        pointsState.add(mutableListOf())
-//                println("onDragStart:: $it")
-                    }, onDragEnd = {
-//                println("onDragEnd::")
-                    }, onDragCancel = {
-//                println("onDragCancel::")
-                    }, onDrag = { change, _ ->
-                        pointsState.last().add(change.position)
-//                println(">>> pos: ${change.position} , uptime: ${change.uptimeMillis}, dragamount: $dragAmount")
-                    })
-                }
+        .ifOnly(state.isCurrentUserDrawing) {
+            Modifier.pointerInput(Unit) {
+                detectDragGestures(onDragStart = {
+                    val drawingItemInfo = DrawingItemInfo(
+                        strokeWidth = info.value.strokeWidth,
+                        paintColor = info.value.paintColor
+                    )
+                    pointsState.add(drawingItemInfo)
+                }, onDragEnd = {}, onDragCancel = {}, onDrag = { change, _ ->
+                    pointsState.last().offsets.add(change.position)
+                })
             }
         }
     ) {
         Canvas(Modifier.fillMaxSize()) {
-            pointsState.forEach { list ->
+            pointsState.forEach { info ->
                 drawPoints(
-                    list,
-                    PointMode.Polygon,
-                    Color.Red,
-                    strokeWidth = 2.dp.toPx(),
+                    points = info.offsets,
+                    pointMode = PointMode.Polygon,
+                    color = info.paintColor,
+                    strokeWidth = info.strokeWidth,
                     cap = StrokeCap.Round
                 )
             }
@@ -150,8 +191,10 @@ fun WordBlocks(modifier: Modifier, word: GameWord, onAnimationCompleted: () -> U
             }
         }
 
-        LazyRow(modifier = Modifier.align(Alignment.Center)
-            .offset(x = offsetX.value.dp)) {
+        LazyRow(
+            modifier = Modifier.align(Alignment.Center)
+                .offset(x = offsetX.value.dp)
+        ) {
             items(word.actual.length) { index ->
                 Box(
                     modifier = Modifier

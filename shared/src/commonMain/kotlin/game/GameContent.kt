@@ -17,7 +17,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import core.Colors
 import core.extension.toPx
+import game.GameIntent.SelectColor
 import game.GameIntent.SelectLetter
+import game.GameIntent.SelectStrokeWidth
 import game.GameIntent.WiggleAnimationCompleted
 import home.HomeHeader
 
@@ -35,6 +37,10 @@ fun GameContent(component: GameComponent, modifier: Modifier) {
                     component.onIntent(SelectLetter(it))
                 }, onAnimationCompleted = {
                     component.onIntent(WiggleAnimationCompleted)
+                }, onColorSelected = {
+                    component.onIntent(SelectColor(it))
+                }, onStrokeWidthSelected = {
+                    component.onIntent(SelectStrokeWidth(it))
                 })
             }
         }
@@ -48,6 +54,10 @@ fun GameContent(component: GameComponent, modifier: Modifier) {
                     component.onIntent(SelectLetter(it))
                 }, onAnimationCompleted = {
                     component.onIntent(WiggleAnimationCompleted)
+                }, onColorSelected = {
+                    component.onIntent(SelectColor(it))
+                }, onStrokeWidthSelected = {
+                    component.onIntent(SelectStrokeWidth(it))
                 })
             }
         }

@@ -6,7 +6,9 @@ import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import core.Colors
 import game.GameIntent.OnDragMoved
 import game.GameIntent.OnDragStarted
+import game.GameIntent.SelectColor
 import game.GameIntent.SelectLetter
+import game.GameIntent.SelectStrokeWidth
 import game.GameIntent.WiggleAnimationCompleted
 import home.Player
 import kotlinx.coroutines.CoroutineScope
@@ -59,6 +61,12 @@ class GameViewModel(
             WiggleAnimationCompleted -> _uiState.update { it.copy(
                 word = GameWord(actual = it.word.actual)
             ) }
+            is SelectColor -> _uiState.update { it.copy(
+                drawingInfo = it.drawingInfo.copy(paintColor = intent.color)
+            ) }
+            is SelectStrokeWidth -> _uiState.update { it.copy(
+                drawingInfo = it.drawingInfo.copy(strokeWidth = intent.width)
+            ) }
         }
     }
 
@@ -94,15 +102,15 @@ class GameViewModel(
 
     fun otherDrawing() {
         _uiState.value = GameState(
-            isCurrentUser = false,
+            isCurrentUser = true,
             currentTurnUserId = "123",
             currentUsername = "Guest 388h",
             isDrawing = true,
             isChoosing = false,
             players = listOf(
-                Player("123", "Guest123", 12, false, false, getColor()),
-                Player("456", "Guest234", 0, true, false, getColor()),
-                Player("789", "Guest345", 0, false, true, getColor()),
+                Player("123", "Guest123", 12, true, true, getColor()),
+                Player("456", "Guest234", 0, false, false, getColor()),
+                Player("789", "Guest345", 0, false, false, getColor()),
             ),
         word = GameWord("Water")
         )

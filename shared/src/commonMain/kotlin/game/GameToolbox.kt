@@ -26,12 +26,13 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import core.Colors
 import core.Images
+import core.extension.toPx
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun GameToolbox(modifier: Modifier) {
+fun GameToolbox(modifier: Modifier, onColorSelected: (Color) -> Unit, onStrokeWidthSelected: (Float) -> Unit) {
     Box(modifier.background(Color(Colors.KEYBOARD_BACKGROUND)).padding(16.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Column {
@@ -41,8 +42,8 @@ fun GameToolbox(modifier: Modifier) {
                 Spacer(Modifier.height(8.dp))
                 Image(painterResource(Images.CLEAR), null)
             }
-            ColorPalette(Modifier) {}
-            StrokePalette(Modifier.padding(8.dp))
+            ColorPalette(Modifier, onColorSelected)
+            StrokePalette(Modifier.padding(8.dp), onStrokeWidthSelected)
         }
     }
 }
@@ -55,15 +56,16 @@ fun ColorPalette(modifier: Modifier, onColorSelected: (Color) -> Unit) {
             Column(modifier) {
                 Row(Modifier.padding(8.dp)) {
                     for (i in 0..4) {
+                        val color = PAINT_COLORS[(5 * row) + i]
                         Box(Modifier.size(32.dp).background(
-                            color = PAINT_COLORS[(5 * row) + i],
+                            color = color,
                             shape = RoundedCornerShape(CornerSize(16.dp))
                         ).border(
                             1.dp,
                             Color(Colors.BORDER_PALETTE_COLOR),
                             shape = RoundedCornerShape(CornerSize(16.dp))
                         )
-                            .clickable { onColorSelected(PAINT_COLORS[(5 * row) + i]) })
+                            .clickable { onColorSelected(color) })
                         Spacer(Modifier.width(8.dp))
                     }
                     row++
@@ -74,12 +76,13 @@ fun ColorPalette(modifier: Modifier, onColorSelected: (Color) -> Unit) {
 }
 
 @Composable
-fun StrokePalette(modifier: Modifier) {
+fun StrokePalette(modifier: Modifier, onStrokeWidthSelected: (Float) -> Unit) {
     val strokeWidths = remember {
         listOf(4.dp, 8.dp, 16.dp)
     }
     Column(modifier) {
         strokeWidths.forEach { dp ->
+            val pixel = dp.toPx()
             Box(Modifier.size(36.dp).drawBehind {
                 drawCircle(
                     color = Color(Colors.BORDER_PALETTE_COLOR),
@@ -95,7 +98,7 @@ fun StrokePalette(modifier: Modifier) {
                     ),
                 )
                 drawCircle(color = Color(Colors.BORDER_PALETTE_COLOR), radius = dp.toPx() / 2)
-            })
+            }.clickable { onStrokeWidthSelected(pixel) })
             Spacer(Modifier.height(8.dp))
         }
     }
