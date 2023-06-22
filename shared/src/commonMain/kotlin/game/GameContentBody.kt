@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
@@ -48,7 +49,14 @@ fun GameBodyContent(
     onKeyPressed: (Char) -> Unit,
     onAnimationCompleted: () -> Unit,
     onColorSelected: (Color) -> Unit,
-    onStrokeWidthSelected: (Float) -> Unit
+    onStrokeWidthSelected: (Float) -> Unit,
+    forceRestored: () -> Unit,
+    onDragStarted: () -> Unit = {},
+    onDragMoved: (Offset) -> Unit = {},
+    onDragEnded: () -> Unit,
+    onUndo: () -> Unit,
+    onErase: () -> Unit,
+    onClear: () -> Unit,
 ) {
     val drawingInfoState = mutableStateOf(state.drawingInfo)
 
@@ -64,7 +72,9 @@ fun GameBodyContent(
             onStrokeWidthSelected = {
                 onStrokeWidthSelected(it)
             },
-            drawingInfo = drawingInfoState.value
+            drawingInfo = drawingInfoState.value,
+            forceRestored, onDragStarted, onDragMoved, onDragEnded,
+            onUndo, onErase, onClear
         )
 
         state.isOtherUserDrawing -> GameContentOtherUserDrawing(
@@ -129,36 +139,63 @@ fun GameContentCurrentUserDrawing(
     onColorSelected: (Color) -> Unit,
     onStrokeWidthSelected: (Float) -> Unit,
     drawingInfo: DrawingInfo,
+    forceRestored: () -> Unit,
+    onDragStarted: () -> Unit = {},
+    onDragMoved: (Offset) -> Unit = {},
+    onDragEnded: () -> Unit,
+    onUndo: () -> Unit,
+    onErase: () -> Unit,
+    onClear: () -> Unit,
 ) {
     Column(modifier) {
-        DrawingCanvas(Modifier.fillMaxWidth().weight(1f), state, drawingInfo)
+        DrawingCanvas(Modifier.fillMaxWidth().weight(1f), state, drawingInfo, forceRestored, onDragStarted, onDragMoved, onDragEnded)
         GameToolbox(
             Modifier.fillMaxWidth().wrapContentHeight(),
             onColorSelected,
-            onStrokeWidthSelected
+            onStrokeWidthSelected,
+            onUndo, onErase, onClear
         )
     }
 }
 
 @Composable
-fun DrawingCanvas(modifier: Modifier, state: GameState, drawingInfo: DrawingInfo = DrawingInfo()) {
+fun DrawingCanvas(
+    modifier: Modifier,
+    state: GameState,
+    drawingInfo: DrawingInfo = DrawingInfo(),
+    forceRestored: () -> Unit = {},
+    onDragStarted: () -> Unit = {},
+    onDragMoved: (Offset) -> Unit = {},
+    onDragEnded: () -> Unit = {},
+) {
 
-    val pointsState = remember { mutableStateListOf<DrawingItemInfo>() }
+    var pointsState = remember { mutableStateListOf<CanvasPolygon>() }
     val info = rememberUpdatedState(drawingInfo)
+
+    LaunchedEffect(state.forceRestoreState) {
+        if (state.forceRestoreState) {
+            pointsState.clear()
+            pointsState.addAll(state.polygons)
+            forceRestored()
+        }
+    }
 
     Box(modifier.background(Color.White.copy(alpha = 0.5f))
         .padding(16.dp)
         .ifOnly(state.isCurrentUserDrawing) {
             Modifier.pointerInput(Unit) {
                 detectDragGestures(onDragStart = {
-                    val drawingItemInfo = DrawingItemInfo(
+                    val drawingState = CanvasPolygon(
                         strokeWidth = info.value.strokeWidth,
                         paintColor = info.value.paintColor
                     )
-                    pointsState.add(drawingItemInfo)
-                }, onDragEnd = {}, onDragCancel = {}, onDrag = { change, _ ->
-                    pointsState.last().offsets.add(change.position)
-                })
+                    pointsState.add(drawingState)
+                    onDragStarted()
+                }, onDragEnd = { onDragEnded() },
+                    onDragCancel = {}, onDrag = { change, _ ->
+                        pointsState.last().offsets.add(change.position)
+                        onDragMoved(change.position)
+                    })
             }
         }
     ) {

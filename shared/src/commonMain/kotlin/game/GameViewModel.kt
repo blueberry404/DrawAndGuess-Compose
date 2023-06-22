@@ -4,26 +4,25 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import core.Colors
+import game.GameIntent.ClearCanvas
+import game.GameIntent.Erase
+import game.GameIntent.OnDragEnded
 import game.GameIntent.OnDragMoved
 import game.GameIntent.OnDragStarted
 import game.GameIntent.SelectColor
 import game.GameIntent.SelectLetter
 import game.GameIntent.SelectStrokeWidth
+import game.GameIntent.StateRestoreCompleted
+import game.GameIntent.Undo
 import game.GameIntent.WiggleAnimationCompleted
+import game.undo.CanvasCommand
+import game.undo.CanvasSnapshot
 import home.Player
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.cancellable
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 import kotlin.random.Random
 
@@ -35,7 +34,6 @@ class GameViewModel(
     val uiState: StateFlow<GameState> = _uiState
 
     private val scope = CoroutineScope(coroutineContext)
-    private var flowTimer: Flow<Int>? = null
 
     private val colors = listOf(
         Color(Colors.AVATAR_1),
@@ -47,7 +45,11 @@ class GameViewModel(
         Color(Colors.AVATAR_7),
     )
 
-    private val drawingInfo: MutableList<MutableList<Offset>> = mutableListOf()
+    private var polygonPoints: MutableList<MutableList<Offset>> = mutableListOf()
+
+    //ViewModel is originator
+    private var drawingState: CanvasPolygon = CanvasPolygon()
+    private val canvasCommand = CanvasCommand()
 
     init {
         otherDrawing()
@@ -56,17 +58,22 @@ class GameViewModel(
     fun handleIntent(intent: GameIntent) {
         when (intent) {
             is SelectLetter -> checkGuessedWord(intent.letter)
-            OnDragStarted -> drawingInfo.add(mutableListOf())
-            is OnDragMoved -> drawingInfo.last().add(intent.offset)
-            WiggleAnimationCompleted -> _uiState.update { it.copy(
-                word = GameWord(actual = it.word.actual)
-            ) }
+            is OnDragMoved -> polygonPoints.last().add(intent.offset)
             is SelectColor -> _uiState.update { it.copy(
                 drawingInfo = it.drawingInfo.copy(paintColor = intent.color)
             ) }
             is SelectStrokeWidth -> _uiState.update { it.copy(
                 drawingInfo = it.drawingInfo.copy(strokeWidth = intent.width)
             ) }
+            OnDragStarted -> polygonPoints.add(mutableListOf())
+            OnDragEnded -> saveSnapshot()
+            WiggleAnimationCompleted -> _uiState.update { it.copy(
+                word = GameWord(actual = it.word.actual)
+            ) }
+            Undo -> restoreSnapshot()
+            ClearCanvas -> onClearCanvas()
+            Erase -> {}
+            StateRestoreCompleted -> _uiState.update { it.copy(forceRestoreState = false) }
         }
     }
 
@@ -99,6 +106,33 @@ class GameViewModel(
     private fun isWrongGuess(actual: String, guessed: String) =
         actual.length == guessed.length && actual.lowercase() != guessed.lowercase()
 
+    private fun saveSnapshot() {
+        val (stroke, color) = _uiState.value.drawingInfo
+        val newState = CanvasPolygon(polygonPoints.last(), stroke, color)
+        canvasCommand.save(newState)
+    }
+
+    private fun restoreSnapshot() {
+        canvasCommand.undo()?.let { cState ->
+            this.drawingState = cState.polygons.lastOrNull() ?: CanvasPolygon()
+            polygonPoints = cState.polygons.map { it.offsets }.toMutableList()
+            _uiState.update { gameState ->
+                gameState.copy(
+                    drawingInfo = DrawingInfo(drawingState.strokeWidth, drawingState.paintColor),
+                    forceRestoreState = true,
+                    polygons = cState.polygons
+                )
+            }
+        } ?: run {
+            onClearCanvas()
+        }
+    }
+
+    private fun onClearCanvas() {
+        canvasCommand.clear()
+        polygonPoints.clear()
+        _uiState.update { it.copy(forceRestoreState = true, polygons = emptyList()) }
+    }
 
     fun otherDrawing() {
         _uiState.value = GameState(
@@ -135,21 +169,4 @@ class GameViewModel(
     }
 
     private fun getColor() = colors[Random.nextInt(colors.size)]
-
-    private fun initTimer() {
-        flowTimer = (1..20)
-            .asSequence()
-            .asFlow()
-            .cancellable()
-            .onEach { delay(1_000) }
-            .onCompletion {
-
-            }
-
-        scope.launch {
-            flowTimer?.collectLatest { sec ->
-                _uiState.update { it.copy(currentTime = sec) }
-            }
-        }
-    }
 }

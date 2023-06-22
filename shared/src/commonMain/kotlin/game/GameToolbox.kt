@@ -32,15 +32,31 @@ import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun GameToolbox(modifier: Modifier, onColorSelected: (Color) -> Unit, onStrokeWidthSelected: (Float) -> Unit) {
+fun GameToolbox(
+    modifier: Modifier,
+    onColorSelected: (Color) -> Unit,
+    onStrokeWidthSelected: (Float) -> Unit,
+    onUndo: () -> Unit,
+    onErase: () -> Unit,
+    onClear: () -> Unit,
+) {
     Box(modifier.background(Color(Colors.KEYBOARD_BACKGROUND)).padding(16.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Column {
-                Image(painterResource(Images.UNDO), null)
+                Image(
+                    painter = painterResource(Images.UNDO),
+                    null,
+                    modifier = Modifier.clickable { onUndo() })
                 Spacer(Modifier.height(8.dp))
-                Image(painterResource(Images.ERASER), null)
+                Image(
+                    painter = painterResource(Images.ERASER),
+                    null,
+                    modifier = Modifier.clickable { onErase() })
                 Spacer(Modifier.height(8.dp))
-                Image(painterResource(Images.CLEAR), null)
+                Image(
+                    painter = painterResource(Images.CLEAR),
+                    null,
+                    modifier = Modifier.clickable { onClear() })
             }
             ColorPalette(Modifier, onColorSelected)
             StrokePalette(Modifier.padding(8.dp), onStrokeWidthSelected)

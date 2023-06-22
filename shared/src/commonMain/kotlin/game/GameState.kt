@@ -17,6 +17,8 @@ data class GameState(
     val currentTime: Int = 0,
     val word: GameWord = GameWord(),
     val drawingInfo: DrawingInfo = DrawingInfo(),
+    val forceRestoreState: Boolean = false,
+    val polygons: List<CanvasPolygon> = mutableListOf()
 ) {
     val isCurrentUserChoosing = isCurrentUser && isChoosing
     val isOtherUserChoosing = !isCurrentUser && isChoosing
@@ -28,17 +30,10 @@ data class GameWord(val actual: String = "", val guessed: String = "", val wiggl
 
 data class DrawingInfo(val strokeWidth: Float = 4f, val paintColor: Color = Color.Red)
 
-data class DrawingItemInfo(
+data class CanvasPolygon(
     val offsets: MutableList<Offset> = mutableListOf(),
     val strokeWidth: Float = 4f,
     val paintColor: Color = Color.Red
 )
 
-sealed class GameIntent {
-    data class SelectLetter(val letter: Char) : GameIntent()
-    object OnDragStarted : GameIntent()
-    data class OnDragMoved(val offset: Offset) : GameIntent()
-    object WiggleAnimationCompleted : GameIntent()
-    data class SelectColor(val color: Color) : GameIntent()
-    data class SelectStrokeWidth(val width: Float) : GameIntent()
-}
+data class CanvasState(val polygons: List<CanvasPolygon>)

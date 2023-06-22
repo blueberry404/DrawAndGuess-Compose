@@ -17,9 +17,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import core.Colors
 import core.extension.toPx
+import game.GameIntent.ClearCanvas
+import game.GameIntent.Erase
+import game.GameIntent.OnDragEnded
+import game.GameIntent.OnDragMoved
+import game.GameIntent.OnDragStarted
 import game.GameIntent.SelectColor
 import game.GameIntent.SelectLetter
 import game.GameIntent.SelectStrokeWidth
+import game.GameIntent.StateRestoreCompleted
+import game.GameIntent.Undo
 import game.GameIntent.WiggleAnimationCompleted
 import home.HomeHeader
 
@@ -33,15 +40,7 @@ fun GameContent(component: GameComponent, modifier: Modifier) {
             }
             Column(Modifier.zIndex(-1f)) {
                 Spacer(Modifier.height(45.dp))
-                GameBodyContent(Modifier.fillMaxSize(), state, onKeyPressed = {
-                    component.onIntent(SelectLetter(it))
-                }, onAnimationCompleted = {
-                    component.onIntent(WiggleAnimationCompleted)
-                }, onColorSelected = {
-                    component.onIntent(SelectColor(it))
-                }, onStrokeWidthSelected = {
-                    component.onIntent(SelectStrokeWidth(it))
-                })
+                GameBody(component, state)
             }
         }
         else {
@@ -50,18 +49,30 @@ fun GameContent(component: GameComponent, modifier: Modifier) {
                     GameHeader(state = state)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                GameBodyContent(Modifier.fillMaxSize(), state, onKeyPressed = {
-                    component.onIntent(SelectLetter(it))
-                }, onAnimationCompleted = {
-                    component.onIntent(WiggleAnimationCompleted)
-                }, onColorSelected = {
-                    component.onIntent(SelectColor(it))
-                }, onStrokeWidthSelected = {
-                    component.onIntent(SelectStrokeWidth(it))
-                })
+                GameBody(component, state)
             }
         }
     }
+}
+
+@Composable
+fun GameBody(component: GameComponent, state: GameState) {
+    GameBodyContent(Modifier.fillMaxSize(), state, onKeyPressed = {
+        component.onIntent(SelectLetter(it))
+    }, onAnimationCompleted = {
+        component.onIntent(WiggleAnimationCompleted)
+    }, onColorSelected = {
+        component.onIntent(SelectColor(it))
+    }, onStrokeWidthSelected = {
+        component.onIntent(SelectStrokeWidth(it))
+    }, forceRestored = {
+        component.onIntent(StateRestoreCompleted)
+    }, onDragStarted = { component.onIntent(OnDragStarted) },
+        onDragMoved = { component.onIntent(OnDragMoved(it)) },
+        onDragEnded = { component.onIntent(OnDragEnded) },
+    onUndo = { component.onIntent(Undo) },
+    onClear = { component.onIntent(ClearCanvas) },
+    onErase = { component.onIntent(Erase) })
 }
 
 @Composable
