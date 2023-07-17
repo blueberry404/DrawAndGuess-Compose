@@ -15,6 +15,7 @@ import game.DefaultGameComponent
 import home.DefaultHomeComponent
 import home.GameMode
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import root.DAGRootComponent.DAGChild
 import root.DAGRootComponent.DAGChild.CreateRoomChild
 import root.DAGRootComponent.DAGChild.GameChild
@@ -40,7 +41,7 @@ class DefaultDAGRootComponent(
 
     private fun child(config: Config, componentContext: ComponentContext): DAGChild =
         when (config) {
-            is Config.Home -> HomeChild(getHomeComponent())
+            is Config.Home -> HomeChild(getHomeComponent(componentContext))
             is Config.CreateRoom -> CreateRoomChild(
                 getCreateRoomComponent(
                     config.gameMode,
@@ -57,8 +58,8 @@ class DefaultDAGRootComponent(
             is Config.Game -> GameChild(getGameComponent(config.roomId, componentContext))
         }
 
-    private fun getHomeComponent() =
-        DefaultHomeComponent { gameMode, roomMode ->
+    private fun getHomeComponent(componentContext: ComponentContext) =
+        DefaultHomeComponent(componentContext, Dispatchers.IO) { gameMode, roomMode ->
 //            navigation.push(Config.CreateRoom(gameMode, roomMode))
             navigation.push(Config.Game("123"))
         }

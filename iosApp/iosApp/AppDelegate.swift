@@ -8,7 +8,15 @@
 
 import Foundation
 import UIKit
+import shared
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     let lifecycleManager = LifecycleManager()
+    
+    override init() {
+        super.init()
+#if DEBUG
+        Main_iosKt.debugLogs()
+#endif
+    }
 }

@@ -10,6 +10,7 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation(project(":shared"))
+                implementation("io.github.aakira:napier:2.6.1")
             }
         }
     }
@@ -40,4 +41,5 @@ android {
 dependencies {
     implementation("com.arkivanov.decompose:decompose:2.0.0-compose-experimental-alpha-02")
     implementation("com.arkivanov.decompose:extensions-compose-jetbrains:2.0.0-compose-experimental-alpha-02")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
 }
