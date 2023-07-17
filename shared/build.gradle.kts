@@ -64,6 +64,11 @@ kotlin {
 
                 implementation("io.github.aakira:napier:2.6.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2")
+
+                val settings = "1.0.0"
+                implementation("com.russhwolf:multiplatform-settings-no-arg:$settings")
+                implementation("com.russhwolf:multiplatform-settings-serialization:$settings")
+                implementation("com.russhwolf:multiplatform-settings-coroutines:$settings")
             }
         }
         val androidMain by getting {

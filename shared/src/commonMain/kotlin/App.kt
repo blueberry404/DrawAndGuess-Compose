@@ -19,5 +19,3 @@ fun App(rootComponent: DAGRootComponent) {
         }
     }
 }
-
-expect fun getPlatformName(): String

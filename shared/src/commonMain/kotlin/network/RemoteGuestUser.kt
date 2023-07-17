@@ -12,6 +12,7 @@ data class RemoteUser(
     val avatarColor: String,
 )
 
+@kotlinx.serialization.Serializable
 data class User(
     val id: String,
     val userName: String,
