@@ -39,7 +39,7 @@ import core.animations.bounceClick
 import core.extension.toPx
 import core.widgets.GameLogo
 import home.GameMode.Many
-import home.GameMode.OneToOne
+import home.GameMode.Single
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
@@ -103,7 +103,7 @@ fun GameOptionsCard1(createRoom: (GameMode) -> Unit) {
             ),
             shape = RoundedCornerShape(8.dp)
         )
-            .fillMaxWidth().clickable { createRoom(OneToOne) }
+            .fillMaxWidth().clickable { createRoom(Single) }
     ) {
         Box(modifier = Modifier.wrapContentHeight()) {
             Image(

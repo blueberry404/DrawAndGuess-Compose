@@ -1,7 +1,13 @@
 package home
 
 enum class GameMode {
-    OneToOne,
+    Single,
     Many,
-    None,
+    None;
+
+    override fun toString() = when (this) {
+        Single -> "Single"
+        Many -> "Many"
+        None -> ""
+    }
 }

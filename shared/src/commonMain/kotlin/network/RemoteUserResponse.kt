@@ -1,9 +1,11 @@
 package network
 
-@kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializable
+
+@Serializable
 class RemoteUserResponse: BaseResponse<RemoteUser>()
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class RemoteUser(
     val id: String,
     val username: String,
@@ -12,7 +14,7 @@ data class RemoteUser(
     val avatarColor: String,
 )
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class User(
     val id: String,
     val userName: String,

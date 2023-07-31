@@ -60,8 +60,8 @@ class DefaultDAGRootComponent(
 
     private fun getHomeComponent(componentContext: ComponentContext) =
         DefaultHomeComponent(componentContext, Dispatchers.IO) { gameMode, roomMode ->
-//            navigation.push(Config.CreateRoom(gameMode, roomMode))
-            navigation.push(Config.Game("123"))
+            navigation.push(Config.CreateRoom(gameMode, roomMode))
+//            navigation.push(Config.Game("123"))
         }
 
     private fun getCreateRoomComponent(

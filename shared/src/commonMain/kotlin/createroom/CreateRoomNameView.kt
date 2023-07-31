@@ -45,9 +45,11 @@ fun RoomNameInput(
 ) {
     TextField(
         value = inputText,
-        onValueChange = {
-            val finalStr = if (maxChars != Int.MAX_VALUE) it.take(maxChars) else it
-            onTextChanged(finalStr)
+        onValueChange = { changed ->
+            val finalStr = if (maxChars != Int.MAX_VALUE) changed.take(maxChars) else changed
+            if(finalStr.all { it.isLetterOrDigit() }) {
+                onTextChanged(finalStr)
+            }
         },
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text,
