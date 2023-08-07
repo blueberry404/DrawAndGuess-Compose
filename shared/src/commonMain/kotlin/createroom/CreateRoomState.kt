@@ -5,6 +5,8 @@ data class CreateRoomState(
     val roomName: String = "",
     val roomPassword: String = "",
     val buttonTitle: String = "",
+    val showSnackBar: Boolean = false,
+    val errorMessage: String = "",
 )
 
 sealed class CreateRoomIntent {
@@ -14,7 +16,6 @@ sealed class CreateRoomIntent {
 }
 
 sealed class CreateRoomAction {
-    data class ShowDialog(val icon: String, val message: String, val buttonTitle: String) :
-        CreateRoomAction()
+
     data class ShowWaitingLobby(val roomId: String): CreateRoomAction()
 }

@@ -77,6 +77,7 @@ kotlin {
                 api("androidx.appcompat:appcompat:1.6.1")
                 api("androidx.core:core-ktx:1.9.0")
                 implementation("io.ktor:ktor-client-okhttp:$ktor")
+                implementation("com.squareup.okhttp3:okhttp:4.10.0")
             }
         }
         val iosX64Main by getting

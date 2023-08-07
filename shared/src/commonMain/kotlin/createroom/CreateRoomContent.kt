@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +13,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.Snackbar
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -25,6 +29,7 @@ import core.widgets.GameLogo
 import createroom.CreateRoomIntent.CreateRoom
 import createroom.CreateRoomIntent.OnRoomNameChanged
 import createroom.CreateRoomIntent.OnRoomPasswordChanged
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
@@ -34,34 +39,43 @@ fun CreateRoomContent(component: CreateRoomComponent, modifier: Modifier) {
 
     val state by component.uiState.collectAsState()
 
-    Column(modifier = modifier.fillMaxSize().background(brush = getAppGradient()).padding(32.dp)) {
-        Row(horizontalArrangement = Arrangement.Start) {
-            Image(
-                painterResource(Images.BACK),
-                contentDescription = "Back Button",
-                modifier = Modifier.size(32.dp).clickable { component.onBackPressed() }
-            )
-        }
+    Box(modifier = modifier.fillMaxSize().background(brush = getAppGradient()).padding(32.dp)) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceAround,
+            modifier = modifier.fillMaxSize()
         ) {
-            Spacer(Modifier.height(16.dp))
-            GameLogo()
-            Spacer(Modifier.height(40.dp))
-            RoomNameInputView(inputText = state.roomName) {
-                component.onIntent(OnRoomNameChanged(it))
+            Row(horizontalArrangement = Arrangement.Start) {
+                Image(
+                    painterResource(Images.BACK),
+                    contentDescription = "Back Button",
+                    modifier = Modifier.size(32.dp).clickable { component.onBackPressed() }
+                )
             }
-            Spacer(Modifier.height(32.dp))
-            RoomPasswordInputView(inputText = state.roomPassword) {
-                component.onIntent(OnRoomPasswordChanged(it))
-            }
-            Spacer(Modifier.height(40.dp))
-            DAGButton(
-                Modifier.width(150.dp).height(48.dp),
-                title = state.buttonTitle
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceAround,
             ) {
-                component.onIntent(CreateRoom)
+                Spacer(Modifier.height(16.dp))
+                GameLogo()
+                Spacer(Modifier.height(40.dp))
+                RoomNameInputView(inputText = state.roomName) {
+                    component.onIntent(OnRoomNameChanged(it))
+                }
+                Spacer(Modifier.height(32.dp))
+                RoomPasswordInputView(inputText = state.roomPassword) {
+                    component.onIntent(OnRoomPasswordChanged(it))
+                }
+                Spacer(Modifier.height(40.dp))
+                DAGButton(
+                    Modifier.width(150.dp).height(48.dp),
+                    title = state.buttonTitle
+                ) {
+                    component.onIntent(CreateRoom)
+                }
+            }
+        }
+        if (state.showSnackBar) {
+            Snackbar(modifier = Modifier.align(Alignment.BottomStart)) {
+                Text(state.errorMessage)
             }
         }
     }

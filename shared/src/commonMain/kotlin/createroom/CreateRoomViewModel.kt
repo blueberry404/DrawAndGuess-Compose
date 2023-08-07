@@ -9,10 +9,12 @@ import createroom.CreateRoomIntent.OnRoomPasswordChanged
 import createroom.RoomContentMode.Create
 import createroom.RoomContentMode.Join
 import home.GameMode
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,13 +26,16 @@ import network.Resource
 import network.Resource.Error
 import network.Resource.Success
 import network.Room
+import sockets.SocketEvent
+import sockets.SocketEventsListener
+import sockets.SocketManager
 import kotlin.coroutines.CoroutineContext
 
 internal class CreateRoomViewModel(
-    private val ioContext: CoroutineContext,
+    ioContext: CoroutineContext,
     private val gameMode: GameMode,
     private val roomMode: RoomContentMode
-) : InstanceKeeper.Instance {
+) : InstanceKeeper.Instance, SocketEventsListener {
 
     private var _uiState = MutableStateFlow(
         CreateRoomState(
@@ -45,14 +50,27 @@ internal class CreateRoomViewModel(
     private val scope = CoroutineScope(ioContext + SupervisorJob())
     private val repository = DAGRepository()
 
+    private var hasRoomCreated = true
+
+    init {
+        SocketManager.setListener(this)
+    }
+
     override fun onDestroy() {
+        SocketManager.removeListener()
         scope.cancel()
     }
 
     fun handleIntent(intent: CreateRoomIntent) {
         when (intent) {
-            is OnRoomNameChanged -> _uiState.update { it.copy(roomName = intent.roomName) }
-            is OnRoomPasswordChanged -> _uiState.update { it.copy(roomPassword = intent.password) }
+            is OnRoomNameChanged -> {
+                hasRoomCreated = false
+                _uiState.update { it.copy(roomName = intent.roomName) }
+            }
+            is OnRoomPasswordChanged -> {
+                hasRoomCreated = false
+                _uiState.update { it.copy(roomPassword = intent.password) }
+            }
             CreateRoom -> checkData()
         }
     }
@@ -61,7 +79,7 @@ internal class CreateRoomViewModel(
         if (isValid()) {
             request()
         } else {
-            // TODO: Show dialog
+            showSnackbar("Both should be min 6 letters")
         }
     }
 
@@ -81,10 +99,11 @@ internal class CreateRoomViewModel(
                 is Success -> {
                     val room = response.data
                     GlobalData.room = room
-                    connectSocket(room)
+                    hasRoomCreated = true
+                    connectSocket()
                 }
                 is Error -> {
-                    // TODO: Show dialog
+                    showSnackbar(response.error)
                 }
             }
         }
@@ -99,17 +118,26 @@ internal class CreateRoomViewModel(
                 is Success -> {
                     val room = response.data
                     GlobalData.room = room
-                    connectSocket(room)
+                    hasRoomCreated = true
+                    connectSocket()
                 }
                 is Error -> {
-                    // TODO: Show dialog
+                    showSnackbar(response.error)
                 }
             }
         }
     }
 
-    private fun connectSocket(room: Room) {
-        performAction(ShowWaitingLobby(room.id))
+    private fun connectSocket() {
+        SocketManager.connect()
+    }
+
+    private fun showSnackbar(message: String) {
+        _uiState.update { it.copy(showSnackBar = true, errorMessage = message) }
+        scope.launch {
+            delay(2000)
+            _uiState.update { it.copy(showSnackBar = false, errorMessage = "") }
+        }
     }
 
     private fun performAction(action: CreateRoomAction) {
@@ -119,9 +147,24 @@ internal class CreateRoomViewModel(
     }
 
     private fun isValid(): Boolean {
-        val state = _uiState.value
-        return with(state) {
+        return with(_uiState.value) {
             roomName.length >= 6 && roomPassword.length >= 6
         }
+    }
+
+    override fun onConnected() {
+        performAction(ShowWaitingLobby(GlobalData.room?.id.orEmpty()))
+    }
+
+    override fun onDisconnected() {
+        Napier.e { "Disconnected in create room!" }
+    }
+
+    override fun onFailure(reason: String) {
+        showSnackbar(reason)
+    }
+
+    override fun onEvent(event: SocketEvent) {
+
     }
 }
