@@ -22,7 +22,7 @@ class DefaultCreateRoomComponent(
     coroutineContext: CoroutineContext,
     private val gameMode: GameMode,
     private val roomMode: RoomContentMode,
-    private val showWaitingLobby: (String) -> Unit,
+    private val showWaitingLobby: () -> Unit,
     private val popScreen: () -> Unit,
 ): CreateRoomComponent, ComponentContext by componentContext {
 
@@ -49,7 +49,7 @@ class DefaultCreateRoomComponent(
         scope.launch {
             viewModel.actions.collectLatest {
                 when (it) {
-                    is ShowWaitingLobby -> showWaitingLobby(it.roomId)
+                    ShowWaitingLobby -> showWaitingLobby()
                     else -> {}
                 }
             }

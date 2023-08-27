@@ -42,7 +42,7 @@ class DAGRepository {
             val response = service.createRoom(createRoomRequest)
             Napier.d { "Room response:: $response" }
             if (response is Resource.Success) {
-                val roomStatus = mapRoom(response.data)
+                val roomStatus = mapRoom(response.data, user)
                 Success(roomStatus)
             } else {
                 Error((response as Error).error)
@@ -60,7 +60,7 @@ class DAGRepository {
             val response = service.joinRoom(joinRoomRequest)
             Napier.d { "Room response:: $response" }
             if (response is Resource.Success) {
-                val roomStatus = mapRoom(response.data)
+                val roomStatus = mapRoom(response.data, user)
                 Success(roomStatus)
             } else {
                 Error((response as Error).error)
@@ -69,7 +69,21 @@ class DAGRepository {
         return result
     }
 
-    private fun mapRoom(remoteRoom: RemoteRoom): Room {
+    suspend fun getUsers(userIds: List<String>): Resource<List<RoomUser>> {
+        val request = GetUsersInfoRequest(userIds)
+        val response = service.getGameUsers(request)
+        Napier.d { "Room response:: $response" }
+        return if (response is Resource.Success) {
+            val users = mapRemoteGameUsers(response.data)
+            Success(users)
+        } else {
+            Error((response as Error).error)
+        }
+    }
+
+    fun getCurrentUser() = keyValueStorage.user
+
+    private fun mapRoom(remoteRoom: RemoteRoom, user: User): Room {
         val roomStatus = when (remoteRoom.status) {
             "Created" -> RoomStatus.Created
             "Ready" -> RoomStatus.Ready
@@ -81,11 +95,23 @@ class DAGRepository {
             "Single" -> GameMode.Single
             else -> GameMode.Many
         }
-        val users = remoteRoom.users.map {
-            RoomUser(it.id, it.username, it.avatarColor)
-        }
+        val users = mapRemoteGameUsers(remoteRoom.users)
         return with(remoteRoom) {
-            Room(id, gameMode, gameRounds, roomStatus, users, userTurns)
+            Room(
+                id,
+                gameMode,
+                gameRounds,
+                roomStatus,
+                users,
+                userTurns,
+                remoteRoom.adminId == user.id,
+                remoteRoom.name
+            )
         }
     }
+
+    private fun mapRemoteGameUsers(list: List<RemoteRoomUser>) =
+        list.map {
+            RoomUser(it.id, it.username, it.avatarColor)
+        }
 }

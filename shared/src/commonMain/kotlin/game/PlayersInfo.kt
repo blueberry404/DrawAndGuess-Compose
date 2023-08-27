@@ -74,7 +74,7 @@ fun PlayerItem(modifier: Modifier = Modifier, player: Player) {
                 )
             } else {
                 Text(
-                    text = player.score.toString(),
+                    text = player.getInitials(),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color(Colors.PRIMARY_TEXT)

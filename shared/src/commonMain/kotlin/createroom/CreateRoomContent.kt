@@ -20,7 +20,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import core.Images
 import core.getAppGradient
@@ -33,7 +36,7 @@ import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
-@OptIn(ExperimentalResourceApi::class)
+@OptIn(ExperimentalResourceApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun CreateRoomContent(component: CreateRoomComponent, modifier: Modifier) {
 
@@ -54,6 +57,9 @@ fun CreateRoomContent(component: CreateRoomComponent, modifier: Modifier) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceAround,
             ) {
+                val keyboardController = LocalSoftwareKeyboardController.current
+                val focusManager = LocalFocusManager.current
+
                 Spacer(Modifier.height(16.dp))
                 GameLogo()
                 Spacer(Modifier.height(40.dp))
@@ -69,6 +75,8 @@ fun CreateRoomContent(component: CreateRoomComponent, modifier: Modifier) {
                     Modifier.width(150.dp).height(48.dp),
                     title = state.buttonTitle
                 ) {
+                    keyboardController?.hide()
+                    focusManager.clearFocus()
                     component.onIntent(CreateRoom)
                 }
             }

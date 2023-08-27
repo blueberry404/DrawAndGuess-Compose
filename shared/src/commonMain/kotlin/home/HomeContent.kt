@@ -23,15 +23,21 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import core.Colors
 import core.Images
@@ -45,35 +51,56 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun HomeContent(component: HomeComponent, modifier: Modifier) {
+    val state by component.state.collectAsState()
     Box(modifier.fillMaxSize()) {
         Column(verticalArrangement = Arrangement.SpaceAround) {
             HomeHeader(modifier.fillMaxWidth().height(60.dp), 60.dp.toPx()) {
-                HeaderContent()
+                state.user?.let { HeaderContent(it) }
             }
             Spacer(modifier = Modifier.height(16.dp))
             GameLogo()
             Spacer(modifier = Modifier.height(40.dp))
-            GameOptionsSection(component::onGameOptionSelected, component::joinRoom)
+            if (state.isLoading) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Companion.Center) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(52.dp),
+                        color = Color(Colors.BACKGROUND_YELLOW),
+                        strokeCap = StrokeCap.Round
+                    )
+                }
+            } else if (state.hasError()) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    Image(painterResource(Images.WARNING), "", Modifier.size(72.dp))
+                    Spacer(Modifier.height(16.dp))
+                    Text(
+                        modifier = Modifier.padding(16.dp),
+                        text = state.errorMessage.orEmpty(),
+                        style = MaterialTheme.typography.h6,
+                        color = Color(Colors.BACKGROUND_YELLOW),
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            } else {
+                GameOptionsSection(component::onGameOptionSelected, component::joinRoom)
+            }
         }
     }
 }
 
 @Composable
-fun HeaderContent() {
+fun HeaderContent(userInfo: HomeUserInfo) {
     Row(
         modifier = Modifier.padding(8.dp).fillMaxSize(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Card(Modifier.clip(CircleShape).size(35.dp)) {
-            Image(
-                painterResource(Images.PLACEHOLDER),
-                contentDescription = "Profile Image",
-                modifier = Modifier.fillMaxSize()
-            )
-        }
+        AvatarView(Modifier.size(35.dp), userInfo.avatarInfo)
         Spacer(Modifier.width(8.dp))
         Text(
-            text = "Welcome Guest 1024!",
+            text = userInfo.welcomeText,
             style = MaterialTheme.typography.body2,
             color = Color(Colors.PRIMARY_TEXT)
         )
@@ -90,6 +117,7 @@ fun GameOptionsSection(createRoom: (GameMode) -> Unit, joinRoomClicked: () -> Un
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun GameOptionsCard1(createRoom: (GameMode) -> Unit) {
     Box(
@@ -119,7 +147,8 @@ fun GameOptionsCard1(createRoom: (GameMode) -> Unit) {
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Turn Based 1 on 1", style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold),
+                        text = "Turn Based 1 on 1",
+                        style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold),
                         color = Color(Colors.PRIMARY_TEXT)
                     )
                     Text(
@@ -162,7 +191,8 @@ fun GameOptionsCard2(createRoom: (GameMode) -> Unit) {
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Play with Friends", style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold),
+                        text = "Play with Friends",
+                        style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold),
                         color = Color(Colors.PRIMARY_TEXT)
                     )
                     Text(
@@ -193,8 +223,10 @@ fun JoinTeamCard(joinRoomClicked: () -> Unit) {
             .wrapContentHeight()
             .clickable { joinRoomClicked() }
     ) {
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center) {
+        Row(
+            modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
             Text(
                 text = "Have Code?", style = MaterialTheme.typography.subtitle1,
                 color = Color(Colors.PRIMARY_TEXT)

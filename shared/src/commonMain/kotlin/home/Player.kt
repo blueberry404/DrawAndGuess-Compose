@@ -1,6 +1,7 @@
 package home
 
 import androidx.compose.ui.graphics.Color
+import core.extension.getInitials
 
 data class Player(
     val id: String,
@@ -11,4 +12,5 @@ data class Player(
     val color: Color,
 ) {
     fun getDisplayName() = if (isCurrentUser) "You" else name
+    fun getInitials() = name.getInitials()
 }

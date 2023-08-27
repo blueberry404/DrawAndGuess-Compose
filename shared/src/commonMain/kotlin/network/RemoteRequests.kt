@@ -19,3 +19,8 @@ data class JoinRoomRequest(
     val name: String,
     val password: String,
 )
+
+@Serializable
+data class GetUsersInfoRequest(
+    val userIds: List<String>,
+)

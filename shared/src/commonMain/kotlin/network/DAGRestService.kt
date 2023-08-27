@@ -1,11 +1,13 @@
 package network
 
 import io.github.aakira.napier.Napier
+import io.ktor.client.plugins.expectSuccess
 import io.ktor.client.request.setBody
 import io.ktor.client.request.url
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
+import network.Constants.BASE_URL
 
 class DAGRestService {
 
@@ -56,7 +58,7 @@ class DAGRestService {
     suspend fun joinRoom(joinRoomRequest: JoinRoomRequest): Resource<RemoteRoom> {
         val response = client.makeRequest<RemoteRoomResponse> {
             method = HttpMethod.Post
-            url(ROOM_ROUTE)
+            url(ROOM_JOIN_ROUTE)
             contentType(ContentType.Application.Json)
             setBody(joinRoomRequest)
         }
@@ -74,9 +76,31 @@ class DAGRestService {
         }
     }
 
+    suspend fun getGameUsers(request: GetUsersInfoRequest): Resource<List<RemoteRoomUser>> {
+        val response = client.makeRequest<RemoteUsersResponse> {
+            method = HttpMethod.Post
+            url(USERS_INFO_ROUTE)
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }
+        return if (response is Resource.Success) {
+            if (response.data.data == null) {
+                Resource.Error("No content")
+            }
+            else {
+                Napier.d { response.data.data.toString() }
+                Resource.Success(response.data.data)
+            }
+        }
+        else {
+            response as Resource.Error
+        }
+    }
+
     companion object {
-        private const val BASE_URL = "http://192.168.8.103:3000/api/v1/"
         private const val USERS_ROUTE = "${BASE_URL}users"
+        private const val USERS_INFO_ROUTE = "${BASE_URL}users/info"
         private const val ROOM_ROUTE = "${BASE_URL}room"
+        private const val ROOM_JOIN_ROUTE = "${BASE_URL}room/join"
     }
 }

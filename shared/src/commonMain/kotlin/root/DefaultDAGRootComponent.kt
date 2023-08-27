@@ -21,6 +21,7 @@ import root.DAGRootComponent.DAGChild.CreateRoomChild
 import root.DAGRootComponent.DAGChild.GameChild
 import root.DAGRootComponent.DAGChild.HomeChild
 import root.DAGRootComponent.DAGChild.WaitingRoomChild
+import root.DefaultDAGRootComponent.Config.Game
 import waitingroom.DefaultWaitingRoomComponent
 
 class DefaultDAGRootComponent(
@@ -51,17 +52,15 @@ class DefaultDAGRootComponent(
             )
             is Config.WaitingRoom -> WaitingRoomChild(
                 getWaitingRoomComponent(
-                    config.roomId,
                     componentContext
                 )
             )
-            is Config.Game -> GameChild(getGameComponent(config.roomId, componentContext))
+            is Config.Game -> GameChild(getGameComponent(componentContext))
         }
 
     private fun getHomeComponent(componentContext: ComponentContext) =
         DefaultHomeComponent(componentContext, Dispatchers.IO) { gameMode, roomMode ->
             navigation.push(Config.CreateRoom(gameMode, roomMode))
-//            navigation.push(Config.Game("123"))
         }
 
     private fun getCreateRoomComponent(
@@ -70,24 +69,24 @@ class DefaultDAGRootComponent(
         componentContext: ComponentContext
     ) =
         DefaultCreateRoomComponent(componentContext, Dispatchers.Main, gameMode, roomMode, {
-            navigation.push(Config.WaitingRoom(it))
+            navigation.push(Config.WaitingRoom)
         }) {
             navigation.pop()
         }
 
-    private fun getWaitingRoomComponent(roomId: String, componentContext: ComponentContext) =
-        DefaultWaitingRoomComponent(componentContext, Dispatchers.Main, roomId) {
+    private fun getWaitingRoomComponent(componentContext: ComponentContext) =
+        DefaultWaitingRoomComponent(componentContext, Dispatchers.Main) {
             navigation.pop()
         }
 
-    private fun getGameComponent(roomId: String, componentContext: ComponentContext) =
+    private fun getGameComponent(componentContext: ComponentContext) =
         DefaultGameComponent(componentContext, Dispatchers.Main)
 
     @Parcelize
     private sealed interface Config : Parcelable {
         object Home : Config
         data class CreateRoom(val gameMode: GameMode, val roomMode: RoomContentMode) : Config
-        data class WaitingRoom(val roomId: String) : Config
-        data class Game(val roomId: String): Config
+        object WaitingRoom : Config
+        object Game: Config
     }
 }

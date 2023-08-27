@@ -1,10 +1,11 @@
 package network
 
+import core.exception.DAGException
+import core.exception.ErrorResponse
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.plugins.ClientRequestException
-import io.ktor.client.plugins.ServerResponseException
+import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
@@ -26,7 +27,7 @@ object KtorClient {
                     isLenient = true
                     explicitNulls = false
                     ignoreUnknownKeys = true
-                    expectSuccess = true
+                    expectSuccess = false
                     encodeDefaults = true
                 })
             }
@@ -38,6 +39,16 @@ object KtorClient {
                 }
                 level = LogLevel.BODY
             }
+            HttpResponseValidator {
+                validateResponse { response ->
+                    when (response.status.value) {
+                        in 400..599 -> {
+                            val errorResponse = response.body<ErrorResponse>()
+                            throw DAGException(errorResponse.error.orEmpty())
+                        }
+                    }
+                }
+            }
         }
 }
 
@@ -47,14 +58,9 @@ suspend inline fun <reified T> HttpClient.makeRequest(
     try {
         val response = request { block() }
         Resource.Success(response.body() as T)
-    } catch (e: ClientRequestException) {
-        Napier.e { e.message }
-        val errorResponse = e.response.body<BaseResponse<Any>>()
-        Resource.Error(errorResponse.error ?: "Bad Request!")
-    } catch (e: ServerResponseException) {
-        Napier.e { e.message }
-        val errorResponse = e.response.body<BaseResponse<Any>>()
-        Resource.Error(errorResponse.error ?: "An error occurred. Please try later")
+    } catch (e: DAGException) {
+        Napier.e { e.errorMessage }
+        Resource.Error(e.errorMessage)
     } catch (e: IOException) {
         Napier.e { e.message.orEmpty() }
         Resource.Error("Please check your internet connection")

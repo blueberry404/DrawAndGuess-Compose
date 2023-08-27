@@ -15,12 +15,11 @@ interface WaitingRoomComponent {
 class DefaultWaitingRoomComponent(
     componentContext: ComponentContext,
     coroutineContext: CoroutineContext,
-    private val roomId: String,
     private val popScreen: () -> Unit,
 ): WaitingRoomComponent, ComponentContext by componentContext {
 
     private val viewModel: WaitingRoomViewModel = instanceKeeper.getOrCreate {
-        WaitingRoomViewModel(coroutineContext, roomId)
+        WaitingRoomViewModel(coroutineContext)
     }
     override val uiState = viewModel.uiState
 

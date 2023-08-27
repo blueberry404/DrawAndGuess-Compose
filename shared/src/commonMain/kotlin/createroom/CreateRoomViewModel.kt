@@ -22,11 +22,10 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import network.DAGRepository
-import network.Resource
 import network.Resource.Error
 import network.Resource.Success
-import network.Room
 import sockets.SocketEvent
+import sockets.SocketEvent.UserJoined
 import sockets.SocketEventsListener
 import sockets.SocketManager
 import kotlin.coroutines.CoroutineContext
@@ -153,10 +152,22 @@ internal class CreateRoomViewModel(
     }
 
     override fun onConnected() {
-        performAction(ShowWaitingLobby(GlobalData.room?.id.orEmpty()))
+        Napier.e { "onconnected!" }
+        repository.getCurrentUser()?.let { user ->
+            if (roomMode == Create) {
+                SocketManager.addDefaultRoomUser(user.id)
+                SocketManager.enterUserToRoom(roomMode)
+                performAction(ShowWaitingLobby)
+            } else {
+                SocketManager.enterUserToRoom(roomMode)
+            }
+        } ?: run {
+            showSnackbar("Some error occurred")
+        }
     }
 
     override fun onDisconnected() {
+
         Napier.e { "Disconnected in create room!" }
     }
 
@@ -165,6 +176,9 @@ internal class CreateRoomViewModel(
     }
 
     override fun onEvent(event: SocketEvent) {
-
+        when (event) {
+            is UserJoined -> performAction(ShowWaitingLobby)
+            else -> {}
+        }
     }
 }
