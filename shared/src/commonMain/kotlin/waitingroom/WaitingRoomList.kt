@@ -39,7 +39,7 @@ fun WaitingRoomList(modifier: Modifier, users: List<WaitingUser>) {
 @Composable
 fun WaitingUserRow(modifier: Modifier, user: WaitingUser) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
-        AvatarView(Modifier.width(35.dp), user.info)
+        AvatarView(Modifier.width(36.dp), user.info)
         Spacer(Modifier.width(16.dp))
         Text(
             text = user.name,

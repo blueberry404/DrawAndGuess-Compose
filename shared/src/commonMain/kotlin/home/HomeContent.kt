@@ -97,7 +97,7 @@ fun HeaderContent(userInfo: HomeUserInfo) {
         modifier = Modifier.padding(8.dp).fillMaxSize(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        AvatarView(Modifier.size(35.dp), userInfo.avatarInfo)
+        AvatarView(Modifier.size(36.dp), userInfo.avatarInfo)
         Spacer(Modifier.width(8.dp))
         Text(
             text = userInfo.welcomeText,

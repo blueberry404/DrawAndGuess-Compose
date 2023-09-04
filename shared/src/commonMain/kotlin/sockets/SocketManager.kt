@@ -11,6 +11,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import network.Constants.SOCKET_URL
 import network.User
+import sockets.SocketEvent.RoomInfo
 import sockets.SocketEvent.UserJoined
 import sockets.SocketEvent.UserLeft
 
@@ -58,6 +59,15 @@ object SocketManager: PlatformSocketListener {
         platformSocket.sendMessage(json)
     }
 
+    fun requestRoomInfo() {
+        val roomId = GlobalData.room.id
+        val payload = MessagePayload(roomId = roomId)
+        val message = SocketMessage("info", payload)
+        val json = Json.encodeToString(message)
+        Napier.d { "Socket:: requestRoomInfo:: $json" }
+        platformSocket.sendMessage(json)
+    }
+
     fun signalGameStart() {
         val roomId = GlobalData.room.id
         val payload = MessagePayload(
@@ -71,7 +81,7 @@ object SocketManager: PlatformSocketListener {
     }
 
     override fun onOpen() {
-        Napier.e { "Connected!!!" }
+        Napier.d { "Connected!!!" }
         listener?.onConnected()
     }
 
@@ -81,12 +91,12 @@ object SocketManager: PlatformSocketListener {
     }
 
     override fun onMessage(msg: String) {
-        Napier.e { "Received a message!!! :: $msg" }
+        Napier.d { "Received a message!!! :: $msg" }
         processMessage(msg)
     }
 
     override fun onClosing(code: Int, reason: String) {
-        Napier.e { "OnClosing::: code: $code, reason: $reason" }
+        Napier.d { "OnClosing::: code: $code, reason: $reason" }
     }
 
     override fun onClosed(code: Int, reason: String) {
@@ -105,6 +115,7 @@ object SocketManager: PlatformSocketListener {
             when (socketMessage.type) {
                 "Join" -> {
                     socketMessage.payload.userIds?.let {
+                        Napier.d { "listeber: $listener" }
                         userIds = it.toList()
                         listener?.onEvent(UserJoined(it))
                     }
@@ -113,6 +124,12 @@ object SocketManager: PlatformSocketListener {
                     socketMessage.payload.userIds?.let {
                         userIds = it.toList()
                         listener?.onEvent(UserLeft(it))
+                    }
+                }
+                "Info" -> {
+                    socketMessage.payload.userIds?.let {
+                        userIds = it.toList()
+                        listener?.onEvent(RoomInfo(it))
                     }
                 }
             }
