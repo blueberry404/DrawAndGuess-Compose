@@ -18,6 +18,7 @@ data class RemoteRoom(
     val userTurns: List<String>,
     val adminId: String,
     val name: String,
+    val words: List<String>,
 )
 
 @Serializable
@@ -36,12 +37,13 @@ data class Room(
     val userTurns: List<String> = emptyList(),
     val isAdmin: Boolean = false,
     val name: String = "",
+    val words: List<String> = emptyList(),
 )
 
 data class RoomUser(
-    val id: String,
-    val username: String,
-    val avatarColor: String,
+    val id: String = "",
+    val username: String = "",
+    val avatarColor: String = "#000000",
 ) {
     fun getInitials() = username.getInitials()
 }

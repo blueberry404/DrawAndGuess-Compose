@@ -75,9 +75,11 @@ class DefaultDAGRootComponent(
         }
 
     private fun getWaitingRoomComponent(componentContext: ComponentContext) =
-        DefaultWaitingRoomComponent(componentContext, Dispatchers.Main) {
+        DefaultWaitingRoomComponent(componentContext, Dispatchers.Main, popScreen = {
             navigation.pop()
-        }
+        }, openGame = {
+            navigation.push(Config.Game)
+        })
 
     private fun getGameComponent(componentContext: ComponentContext) =
         DefaultGameComponent(componentContext, Dispatchers.Main)

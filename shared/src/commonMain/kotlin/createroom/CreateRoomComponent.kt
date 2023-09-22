@@ -14,6 +14,7 @@ import home.GameMode
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,7 +56,6 @@ class DefaultCreateRoomComponent(
         )
     )
 
-
     override val uiState: StateFlow<CreateRoomState>
         get() = _uiState
 
@@ -94,6 +94,8 @@ class DefaultCreateRoomComponent(
             SocketManager.removeListener()
         }, onResume = {
             SocketManager.setListener(this)
+        }, onDestroy = {
+            scope.cancel()
         })
     }
 

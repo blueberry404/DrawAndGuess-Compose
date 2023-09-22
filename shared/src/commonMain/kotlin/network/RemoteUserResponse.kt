@@ -17,9 +17,9 @@ data class RemoteUser(
 
 @Serializable
 data class User(
-    val id: String,
-    val userName: String,
-    val avatarColor: String,
+    val id: String = "",
+    val userName: String = "",
+    val avatarColor: String = "#000000",
 ) {
     fun getInitials() = userName.getInitials()
 }

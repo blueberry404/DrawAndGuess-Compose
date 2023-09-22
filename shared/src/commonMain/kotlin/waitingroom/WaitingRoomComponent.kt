@@ -7,9 +7,10 @@ import core.GlobalData
 import home.AvatarInfo
 import home.GameMode.Many
 import home.GameMode.Single
-import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,11 +19,13 @@ import kotlinx.coroutines.launch
 import network.DAGRepository
 import network.Resource
 import sockets.SocketEvent
+import sockets.SocketEvent.PrepareForGame
 import sockets.SocketEvent.RoomInfo
 import sockets.SocketEvent.UserJoined
 import sockets.SocketEvent.UserLeft
 import sockets.SocketEventsListener
 import sockets.SocketManager
+import sockets.SocketManager.KEY_PREPARE_GAME
 import kotlin.coroutines.CoroutineContext
 
 interface WaitingRoomComponent {
@@ -35,6 +38,7 @@ class DefaultWaitingRoomComponent(
     componentContext: ComponentContext,
     coroutineContext: CoroutineContext,
     private val popScreen: () -> Unit,
+    private val openGame: () -> Unit,
 ): WaitingRoomComponent, ComponentContext by componentContext, SocketEventsListener {
 
     private var _uiState = MutableStateFlow(WaitingRoomState())
@@ -57,6 +61,8 @@ class DefaultWaitingRoomComponent(
         }, onResume = {
             SocketManager.setListener(this)
             SocketManager.requestRoomInfo()
+        }, onDestroy = {
+            scope.cancel()
         })
     }
 
@@ -109,7 +115,7 @@ class DefaultWaitingRoomComponent(
     }
 
     private fun startGame() {
-        SocketManager.signalGameStart()
+        SocketManager.signalForGame(KEY_PREPARE_GAME)
     }
 
     override fun onConnected() {
@@ -129,6 +135,12 @@ class DefaultWaitingRoomComponent(
             is UserJoined,
             is UserLeft,
             is RoomInfo -> getUsers()
+            PrepareForGame -> {
+                scope.launch(Dispatchers.Main) {
+                    openGame()
+                }
+            }
+            else -> {}
         }
     }
 }

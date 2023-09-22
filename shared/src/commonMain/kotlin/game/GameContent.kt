@@ -86,7 +86,7 @@ fun GameHeader(modifier: Modifier = Modifier, state: GameState) {
                 state.currentTime.toFloat(),
                 state.totalTimeInSec
             )
+            PlayersInfo(players = state.players)
         }
-        PlayersInfo(players = state.players)
     }
 }

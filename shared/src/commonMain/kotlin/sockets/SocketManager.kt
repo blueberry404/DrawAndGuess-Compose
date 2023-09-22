@@ -11,7 +11,9 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import network.Constants.SOCKET_URL
 import network.User
+import sockets.SocketEvent.PrepareForGame
 import sockets.SocketEvent.RoomInfo
+import sockets.SocketEvent.StartGame
 import sockets.SocketEvent.UserJoined
 import sockets.SocketEvent.UserLeft
 
@@ -23,6 +25,9 @@ object SocketManager: PlatformSocketListener {
     private var userIds: List<String> = emptyList()
     private val keyValueStorage = DefaultKeyValueStorage()
     private var user: User? = null
+
+    const val KEY_PREPARE_GAME = "PrepareGame"
+    const val KEY_START_GAME = "StartGame"
 
     init {
         user = keyValueStorage.user
@@ -68,13 +73,13 @@ object SocketManager: PlatformSocketListener {
         platformSocket.sendMessage(json)
     }
 
-    fun signalGameStart() {
+    fun signalForGame(type: String) {
         val roomId = GlobalData.room.id
         val payload = MessagePayload(
             userId = user?.id.orEmpty(),
             roomId = roomId,
         )
-        val message = SocketMessage("InitGame", payload)
+        val message = SocketMessage(type, payload)
         val json = Json.encodeToString(message)
         Napier.d { "Sending signal:: $json" }
         platformSocket.sendMessage(json)
@@ -132,6 +137,8 @@ object SocketManager: PlatformSocketListener {
                         listener?.onEvent(RoomInfo(it))
                     }
                 }
+                "PrepareForGame" -> listener?.onEvent(PrepareForGame)
+                "StartGame" -> listener?.onEvent(StartGame)
             }
         } catch (exception: SerializationException) {
             Napier.e { exception.message.orEmpty() }

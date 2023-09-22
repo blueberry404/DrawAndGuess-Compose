@@ -81,12 +81,28 @@ class DAGRepository {
         }
     }
 
+    suspend fun getRoom(roomId: String): Resource<Room> {
+        val user = keyValueStorage.user
+        val result = if (user == null) {
+            Error("Some error occurred. Try reopening the app with internet on")
+        } else {
+            val response = service.getRoom(roomId)
+            Napier.d { "Room response:: $response" }
+            if (response is Resource.Success) {
+                val roomStatus = mapRoom(response.data, user)
+                Success(roomStatus)
+            } else {
+                Error((response as Error).error)
+            }
+        }
+        return result
+    }
+
     fun getCurrentUser() = keyValueStorage.user
 
     private fun mapRoom(remoteRoom: RemoteRoom, user: User): Room {
         val roomStatus = when (remoteRoom.status) {
             "Created" -> RoomStatus.Created
-            "Ready" -> RoomStatus.Ready
             "GameStarted" -> RoomStatus.GameStarted
             "Finished" -> RoomStatus.Finished
             else -> Unknown
@@ -105,7 +121,8 @@ class DAGRepository {
                 users,
                 userTurns,
                 remoteRoom.adminId == user.id,
-                remoteRoom.name
+                remoteRoom.name,
+                remoteRoom.words,
             )
         }
     }

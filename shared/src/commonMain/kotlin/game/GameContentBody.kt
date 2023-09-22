@@ -3,6 +3,7 @@ package game
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -39,8 +40,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import core.Colors
+import core.Images
 import core.animations.shakeKeyframes
 import core.extension.ifOnly
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun GameBodyContent(
@@ -61,7 +65,7 @@ fun GameBodyContent(
     val drawingInfoState = mutableStateOf(state.drawingInfo)
 
     when {
-        state.isCurrentUserChoosing -> {}
+        state.isCurrentUserChoosing -> GameContentCurrentUserChoosing(modifier, state)
         state.isOtherUserChoosing -> GameContentOtherUserChoosing(modifier, state)
         state.isCurrentUserDrawing -> GameContentCurrentUserDrawing(
             modifier,
@@ -88,6 +92,31 @@ fun GameBodyContent(
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
+@Composable
+fun GameContentCurrentUserChoosing(modifier: Modifier = Modifier, state: GameState) {
+    Column(
+        modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Image(painterResource(Images.PENCIL), "", Modifier.size(48.dp))
+        Spacer(Modifier.height(48.dp))
+        Text(
+            text = "Time to draw:",
+            fontSize = 24.sp,
+            color = Color(Colors.PRIMARY_TEXT)
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = state.word.actual.uppercase(),
+            fontSize = 42.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(Colors.BACKGROUND_YELLOW)
+        )
+    }
+}
+
 @Composable
 fun GameContentOtherUserChoosing(modifier: Modifier = Modifier, state: GameState) {
     Column(
@@ -108,8 +137,8 @@ fun GameContentOtherUserChoosing(modifier: Modifier = Modifier, state: GameState
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            text = "is choosing word",
-            fontSize = 20.sp,
+            text = "is looking at word",
+            fontSize = 16.sp,
             color = Color(Colors.PRIMARY_TEXT)
         )
     }

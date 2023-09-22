@@ -97,6 +97,26 @@ class DAGRestService {
         }
     }
 
+    suspend fun getRoom(roomId: String): Resource<RemoteRoom> {
+        val response = client.makeRequest<RemoteRoomResponse> {
+            method = HttpMethod.Get
+            url("$ROOM_ROUTE/$roomId")
+            contentType(ContentType.Application.Json)
+        }
+        return if (response is Resource.Success) {
+            if (response.data.data == null) {
+                Resource.Error("No content")
+            }
+            else {
+                Napier.d { response.data.data.toString() }
+                Resource.Success(response.data.data)
+            }
+        }
+        else {
+            response as Resource.Error
+        }
+    }
+
     companion object {
         private const val USERS_ROUTE = "${BASE_URL}users"
         private const val USERS_INFO_ROUTE = "${BASE_URL}users/info"

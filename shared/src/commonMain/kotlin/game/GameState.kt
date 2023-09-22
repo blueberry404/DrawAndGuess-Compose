@@ -2,6 +2,8 @@ package game
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import game.RoundState.Choosing
+import game.RoundState.Drawing
 import home.Player
 
 data class GameState(
@@ -9,10 +11,8 @@ data class GameState(
     val isCurrentUser: Boolean = false,
     val currentTurnUserId: String = "",
     val currentUsername: String = "",
-    val isDrawing: Boolean = false,
-    val isChoosing: Boolean = false,
     val totalRounds: Int = 0,
-    val currentRound: Int = 0,
+    val roundState: RoundState = Choosing,
     val totalTimeInSec: Int = 20,
     val currentTime: Int = 0,
     val word: GameWord = GameWord(),
@@ -20,10 +20,11 @@ data class GameState(
     val forceRestoreState: Boolean = false,
     val polygons: List<CanvasPolygon> = mutableListOf()
 ) {
-    val isCurrentUserChoosing = isCurrentUser && isChoosing
-    val isOtherUserChoosing = !isCurrentUser && isChoosing
-    val isCurrentUserDrawing = isCurrentUser && isDrawing
-    val isOtherUserDrawing = !isCurrentUser && isDrawing
+    val isDrawing: Boolean = roundState == Drawing
+    val isCurrentUserChoosing = isCurrentUser && roundState == Choosing
+    val isOtherUserChoosing = !isCurrentUser && roundState == Choosing
+    val isCurrentUserDrawing = isCurrentUser && roundState == Drawing
+    val isOtherUserDrawing = !isCurrentUser && roundState == Drawing
 }
 
 data class GameWord(val actual: String = "", val guessed: String = "", val wiggle: Boolean = false)
