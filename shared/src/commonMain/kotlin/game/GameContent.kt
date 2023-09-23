@@ -19,6 +19,7 @@ import core.Colors
 import core.extension.toPx
 import game.GameIntent.ClearCanvas
 import game.GameIntent.Erase
+import game.GameIntent.GameStart
 import game.GameIntent.OnDragEnded
 import game.GameIntent.OnDragMoved
 import game.GameIntent.OnDragStarted
@@ -72,7 +73,8 @@ fun GameBody(component: GameComponent, state: GameState) {
         onDragEnded = { component.onIntent(OnDragEnded) },
     onUndo = { component.onIntent(Undo) },
     onClear = { component.onIntent(ClearCanvas) },
-    onErase = { component.onIntent(Erase) })
+    onErase = { component.onIntent(Erase) },
+    startGame = { component.onIntent(GameStart) })
 }
 
 @Composable

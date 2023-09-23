@@ -30,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -43,6 +44,7 @@ import core.Colors
 import core.Images
 import core.animations.shakeKeyframes
 import core.extension.ifOnly
+import core.extension.toPx
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
@@ -61,6 +63,7 @@ fun GameBodyContent(
     onUndo: () -> Unit,
     onErase: () -> Unit,
     onClear: () -> Unit,
+    startGame: () -> Unit,
 ) {
     val drawingInfoState = mutableStateOf(state.drawingInfo)
 
@@ -87,7 +90,7 @@ fun GameBodyContent(
             onKeyPressed,
             onAnimationCompleted
         )
-
+        state.isStarting -> GameStartViewContainer(Modifier.fillMaxSize(), startGame)
         else -> {}
     }
 }
@@ -278,5 +281,21 @@ fun WordBlocks(modifier: Modifier, word: GameWord, onAnimationCompleted: () -> U
                 }
             }
         }
+    }
+}
+
+@Composable
+fun GameStartViewContainer(modifier: Modifier, startGame: () -> Unit) {
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        GameStartView(
+            modifier = Modifier.size(200.dp),
+            strokeWidth = 16.dp.toPx(),
+            colors = arrayOf(
+                Color(Colors.COUNTDOWN_COLOR_1), Color(Colors.COUNTDOWN_COLOR_2), Color(
+                    Colors.COUNTDOWN_COLOR_3
+                ), Color(Colors.COUNTDOWN_COLOR_4)
+            ),
+            textSize = 64.sp,
+        ) { startGame() }
     }
 }

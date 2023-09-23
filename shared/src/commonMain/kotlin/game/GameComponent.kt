@@ -8,6 +8,7 @@ import core.CountDownTimer
 import core.GlobalData
 import game.GameIntent.ClearCanvas
 import game.GameIntent.Erase
+import game.GameIntent.GameStart
 import game.GameIntent.OnDragEnded
 import game.GameIntent.OnDragMoved
 import game.GameIntent.OnDragStarted
@@ -18,10 +19,13 @@ import game.GameIntent.StateRestoreCompleted
 import game.GameIntent.Undo
 import game.GameIntent.WiggleAnimationCompleted
 import game.RoundState.Choosing
+import game.RoundState.Drawing
+import game.RoundState.Starting
 import game.undo.CanvasCommand
 import home.Player
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -118,6 +122,7 @@ class DefaultGameComponent(
             ClearCanvas -> onClearCanvas()
             Erase -> {}
             StateRestoreCompleted -> _uiState.update { it.copy(forceRestoreState = false) }
+            GameStart -> _uiState.update { it.copy(roundState = Drawing) }
         }
     }
 
@@ -245,11 +250,13 @@ class DefaultGameComponent(
     }
 
     override fun onEvent(event: SocketEvent) {
-        when (event) {
-            StartGame -> {
-                Napier.d { "Show 3,2,1" }
+        scope.launch(Dispatchers.Main) {
+            when (event) {
+                StartGame -> {
+                    _uiState.update { it.copy(roundState = Starting) }
+                }
+                else -> {}
             }
-            else -> {}
         }
     }
 

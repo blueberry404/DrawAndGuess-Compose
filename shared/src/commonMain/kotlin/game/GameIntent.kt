@@ -15,4 +15,5 @@ sealed class GameIntent {
     object ClearCanvas : GameIntent()
     object Erase : GameIntent()
     object StateRestoreCompleted : GameIntent()
+    object GameStart : GameIntent()
 }

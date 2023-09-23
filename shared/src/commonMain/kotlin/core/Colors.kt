@@ -30,4 +30,9 @@ object Colors {
     const val PAINT_OLIVE = 0xff808000
     const val PAINT_PURPLE = 0xff800080
     const val PAINT_ORANGE = 0xffFFA500
+
+    const val COUNTDOWN_COLOR_1 = 0xffc34141
+    const val COUNTDOWN_COLOR_2 = 0xffdb9b4c
+    const val COUNTDOWN_COLOR_3 = 0xfff6c634
+    const val COUNTDOWN_COLOR_4 = 0xff77b175
 }

@@ -4,6 +4,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import game.RoundState.Choosing
 import game.RoundState.Drawing
+import game.RoundState.Starting
 import home.Player
 
 data class GameState(
@@ -21,6 +22,7 @@ data class GameState(
     val polygons: List<CanvasPolygon> = mutableListOf()
 ) {
     val isDrawing: Boolean = roundState == Drawing
+    val isStarting: Boolean = roundState == Starting
     val isCurrentUserChoosing = isCurrentUser && roundState == Choosing
     val isOtherUserChoosing = !isCurrentUser && roundState == Choosing
     val isCurrentUserDrawing = isCurrentUser && roundState == Drawing
