@@ -140,7 +140,7 @@ fun GameContentOtherUserChoosing(modifier: Modifier = Modifier, state: GameState
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            text = "is looking at word",
+            text = "is thinking about word",
             fontSize = 16.sp,
             color = Color(Colors.PRIMARY_TEXT)
         )
@@ -204,11 +204,13 @@ fun DrawingCanvas(
     var pointsState = remember { mutableStateListOf<CanvasPolygon>() }
     val info = rememberUpdatedState(drawingInfo)
 
-    LaunchedEffect(state.forceRestoreState) {
-        if (state.forceRestoreState) {
-            pointsState.clear()
-            pointsState.addAll(state.polygons)
-            forceRestored()
+    if (state.isCurrentUserDrawing) {
+        LaunchedEffect(state.forceRestoreState) {
+            if (state.forceRestoreState) {
+                pointsState.clear()
+                pointsState.addAll(state.polygons)
+                forceRestored()
+            }
         }
     }
 
@@ -232,7 +234,8 @@ fun DrawingCanvas(
         }
     ) {
         Canvas(Modifier.fillMaxSize()) {
-            pointsState.forEach { info ->
+            val list = if (state.isCurrentUserDrawing) pointsState else state.polygons
+            list.forEach { info ->
                 drawPoints(
                     points = info.offsets,
                     pointMode = PointMode.Polygon,

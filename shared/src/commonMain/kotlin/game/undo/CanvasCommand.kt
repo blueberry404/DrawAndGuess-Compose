@@ -17,11 +17,15 @@ class CanvasCommand {
     }
 
     fun clear() {
-        snapshots.addLast(CanvasState(emptyList()))
+        snapshots.addLast(CanvasState(mutableListOf()))
     }
 
     fun undo(): CanvasState? {
         snapshots.removeLastOrNull()
+        return snapshots.lastOrNull()
+    }
+
+    fun peek(): CanvasState? {
         return snapshots.lastOrNull()
     }
 }

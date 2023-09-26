@@ -4,4 +4,5 @@ enum class RoundState {
     Choosing,
     Starting,
     Drawing,
+    Ended,
 }

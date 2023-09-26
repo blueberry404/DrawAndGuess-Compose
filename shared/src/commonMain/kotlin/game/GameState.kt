@@ -2,10 +2,13 @@ package game
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import core.serializers.ColorSerializer
+import core.serializers.OffsetSerializer
 import game.RoundState.Choosing
 import game.RoundState.Drawing
 import game.RoundState.Starting
 import home.Player
+import kotlinx.serialization.Serializable
 
 data class GameState(
     val players: List<Player> = emptyList(),
@@ -33,10 +36,12 @@ data class GameWord(val actual: String = "", val guessed: String = "", val wiggl
 
 data class DrawingInfo(val strokeWidth: Float = 4f, val paintColor: Color = Color.Red)
 
+@Serializable
 data class CanvasPolygon(
-    val offsets: MutableList<Offset> = mutableListOf(),
+    val offsets: MutableList<@Serializable(OffsetSerializer::class) Offset> = mutableListOf(),
     val strokeWidth: Float = 4f,
-    val paintColor: Color = Color.Red
+    @Serializable(ColorSerializer::class) val paintColor: Color = Color.Red
 )
 
-data class CanvasState(val polygons: List<CanvasPolygon>)
+@Serializable
+data class CanvasState(val polygons: MutableList<CanvasPolygon>)

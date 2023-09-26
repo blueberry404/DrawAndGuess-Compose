@@ -4,6 +4,7 @@ import core.GlobalData
 import core.storage.DefaultKeyValueStorage
 import createroom.RoomContentMode
 import createroom.RoomContentMode.Create
+import game.CanvasState
 import io.github.aakira.napier.Napier
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
@@ -14,6 +15,7 @@ import network.User
 import sockets.SocketEvent.PrepareForGame
 import sockets.SocketEvent.RoomInfo
 import sockets.SocketEvent.StartGame
+import sockets.SocketEvent.SyncDrawing
 import sockets.SocketEvent.UserJoined
 import sockets.SocketEvent.UserLeft
 
@@ -85,6 +87,22 @@ object SocketManager: PlatformSocketListener {
         platformSocket.sendMessage(json)
     }
 
+    fun syncCanvas(state: CanvasState) {
+        val payload = MessagePayload(
+            userId = user?.id.orEmpty(),
+            roomId = GlobalData.room.id,
+            canvasState = state,
+        )
+        val message = SocketMessage("Sync", payload)
+        val json = Json {
+            isLenient = true
+            ignoreUnknownKeys = true
+            encodeDefaults = true
+        }
+        val jsonString = json.encodeToString(message)
+        platformSocket.sendMessage(jsonString)
+    }
+
     override fun onOpen() {
         Napier.d { "Connected!!!" }
         listener?.onConnected()
@@ -114,13 +132,13 @@ object SocketManager: PlatformSocketListener {
             val json = Json {
                 isLenient = true
                 ignoreUnknownKeys = true
+                encodeDefaults = true
             }
 
             val socketMessage = json.decodeFromString<SocketMessage>(message)
             when (socketMessage.type) {
                 "Join" -> {
                     socketMessage.payload.userIds?.let {
-                        Napier.d { "listeber: $listener" }
                         userIds = it.toList()
                         listener?.onEvent(UserJoined(it))
                     }
@@ -139,6 +157,11 @@ object SocketManager: PlatformSocketListener {
                 }
                 "PrepareForGame" -> listener?.onEvent(PrepareForGame)
                 "StartGame" -> listener?.onEvent(StartGame)
+                "Sync" -> {
+                    socketMessage.payload.canvasState?.let {
+                        listener?.onEvent(SyncDrawing(it))
+                    }
+                }
             }
         } catch (exception: SerializationException) {
             Napier.e { exception.message.orEmpty() }

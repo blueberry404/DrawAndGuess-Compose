@@ -1,6 +1,5 @@
 package game
 
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.lifecycle.subscribe
@@ -26,7 +25,9 @@ import home.Player
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,7 +38,9 @@ import network.Resource
 import network.Room
 import network.RoomUser
 import sockets.SocketEvent
+import sockets.SocketEvent.GameOver
 import sockets.SocketEvent.StartGame
+import sockets.SocketEvent.SyncDrawing
 import sockets.SocketEventsListener
 import sockets.SocketManager
 import sockets.SocketManager.KEY_START_GAME
@@ -67,17 +70,17 @@ class DefaultGameComponent(
     }
 
     private val scope = CoroutineScope(coroutineContext)
-    private var polygonPoints: MutableList<MutableList<Offset>> = mutableListOf()
     private var userTurn: RoomUser = RoomUser()
     private var currentRound = 1
     private var totalRounds = 1
     private var roomInfo = Room()
     private var words: List<String> = emptyList()
     private lateinit var countDownTimer: CountDownTimer
+    private var syncJob: Job? = null
 
     //Component is originator
-    private var drawingState: CanvasPolygon = CanvasPolygon()
     private val canvasCommand = CanvasCommand()
+    private var drawingState: CanvasState = CanvasState(mutableListOf())
 
     init {
         subscribeLifecycle()
@@ -97,7 +100,9 @@ class DefaultGameComponent(
     private fun handleIntent(intent: GameIntent) {
         when (intent) {
             is SelectLetter -> checkGuessedWord(intent.letter)
-            is OnDragMoved -> polygonPoints.last().add(intent.offset)
+            is OnDragMoved -> {
+                drawingState.polygons.last().offsets.add(intent.offset)
+            }
             is SelectColor -> _uiState.update {
                 it.copy(
                     drawingInfo = it.drawingInfo.copy(paintColor = intent.color)
@@ -110,7 +115,15 @@ class DefaultGameComponent(
                 )
             }
 
-            OnDragStarted -> polygonPoints.add(mutableListOf())
+            OnDragStarted -> {
+                val (strokeWidth, color) = _uiState.value.drawingInfo
+                drawingState.polygons.add(
+                    CanvasPolygon(
+                        strokeWidth = strokeWidth,
+                        paintColor = color
+                    )
+                )
+            }
             OnDragEnded -> saveSnapshot()
             WiggleAnimationCompleted -> _uiState.update {
                 it.copy(
@@ -122,7 +135,10 @@ class DefaultGameComponent(
             ClearCanvas -> onClearCanvas()
             Erase -> {}
             StateRestoreCompleted -> _uiState.update { it.copy(forceRestoreState = false) }
-            GameStart -> _uiState.update { it.copy(roundState = Drawing) }
+            GameStart -> {
+                _uiState.update { it.copy(roundState = Drawing) }
+                startJobForCanvasSync()
+            }
         }
     }
 
@@ -154,18 +170,17 @@ class DefaultGameComponent(
         actual.length == guessed.length && actual.lowercase() != guessed.lowercase()
 
     private fun saveSnapshot() {
-        val (stroke, color) = _uiState.value.drawingInfo
-        val newState = CanvasPolygon(polygonPoints.last(), stroke, color)
-        canvasCommand.save(newState)
+        canvasCommand.save(drawingState.polygons.last())
     }
 
     private fun restoreSnapshot() {
         canvasCommand.undo()?.let { cState ->
-            this.drawingState = cState.polygons.lastOrNull() ?: CanvasPolygon()
-            polygonPoints = cState.polygons.map { it.offsets }.toMutableList()
+            this.drawingState = cState
+            val polygon = drawingState.polygons.last()
+
             _uiState.update { gameState ->
                 gameState.copy(
-                    drawingInfo = DrawingInfo(drawingState.strokeWidth, drawingState.paintColor),
+                    drawingInfo = DrawingInfo(polygon.strokeWidth, polygon.paintColor),
                     forceRestoreState = true,
                     polygons = cState.polygons
                 )
@@ -177,7 +192,7 @@ class DefaultGameComponent(
 
     private fun onClearCanvas() {
         canvasCommand.clear()
-        polygonPoints.clear()
+        drawingState.polygons.last().offsets.clear()
         _uiState.update { it.copy(forceRestoreState = true, polygons = emptyList()) }
     }
 
@@ -237,6 +252,17 @@ class DefaultGameComponent(
         }.also { it.start() }
     }
 
+    private fun startJobForCanvasSync() {
+        syncJob = scope.launch(Dispatchers.Default) {
+            while (_uiState.value.isDrawing) {
+                canvasCommand.peek()?.let {
+                    SocketManager.syncCanvas(it)
+                }
+                delay(1_500)
+            }
+        }
+    }
+
     override fun onConnected() {
         TODO("Not yet implemented")
     }
@@ -246,7 +272,7 @@ class DefaultGameComponent(
     }
 
     override fun onFailure(reason: String) {
-        TODO("Not yet implemented")
+        Napier.e { reason }
     }
 
     override fun onEvent(event: SocketEvent) {
@@ -254,6 +280,15 @@ class DefaultGameComponent(
             when (event) {
                 StartGame -> {
                     _uiState.update { it.copy(roundState = Starting) }
+                }
+                GameOver -> {
+                    syncJob?.cancel()
+                }
+                is SyncDrawing -> {
+                    drawingState = event.canvasState
+                    _uiState.update { gameState ->
+                        gameState.copy(polygons = event.canvasState.polygons)
+                    }
                 }
                 else -> {}
             }
