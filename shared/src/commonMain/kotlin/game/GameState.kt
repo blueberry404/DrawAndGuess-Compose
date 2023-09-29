@@ -6,7 +6,9 @@ import core.serializers.ColorSerializer
 import core.serializers.OffsetSerializer
 import game.RoundState.Choosing
 import game.RoundState.Drawing
+import game.RoundState.Ended
 import game.RoundState.Starting
+import game.RoundState.TimeOver
 import home.Player
 import kotlinx.serialization.Serializable
 
@@ -22,10 +24,13 @@ data class GameState(
     val word: GameWord = GameWord(),
     val drawingInfo: DrawingInfo = DrawingInfo(),
     val forceRestoreState: Boolean = false,
-    val polygons: List<CanvasPolygon> = mutableListOf()
+    val polygons: List<CanvasPolygon> = mutableListOf(),
+    val gameOverMessage: String = "",
 ) {
     val isDrawing: Boolean = roundState == Drawing
     val isStarting: Boolean = roundState == Starting
+    val isTimeOver: Boolean = roundState == TimeOver
+    val isGameOver: Boolean = roundState == Ended
     val isCurrentUserChoosing = isCurrentUser && roundState == Choosing
     val isOtherUserChoosing = !isCurrentUser && roundState == Choosing
     val isCurrentUserDrawing = isCurrentUser && roundState == Drawing

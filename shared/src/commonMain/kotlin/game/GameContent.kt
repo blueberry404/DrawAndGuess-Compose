@@ -27,6 +27,7 @@ import game.GameIntent.SelectColor
 import game.GameIntent.SelectLetter
 import game.GameIntent.SelectStrokeWidth
 import game.GameIntent.StateRestoreCompleted
+import game.GameIntent.TimeOver
 import game.GameIntent.Undo
 import game.GameIntent.WiggleAnimationCompleted
 import home.HomeHeader
@@ -37,7 +38,9 @@ fun GameContent(component: GameComponent, modifier: Modifier) {
     Box(modifier.fillMaxSize()) {
         if (state.isDrawing) {
             HomeHeader(modifier.fillMaxWidth().height(60.dp).zIndex(2f), 60.dp.toPx()) {
-                GameHeader(state = state)
+                GameHeader(state = state) {
+                    component.onIntent(TimeOver)
+                }
             }
             Column(Modifier.zIndex(-1f)) {
                 Spacer(Modifier.height(45.dp))
@@ -47,7 +50,9 @@ fun GameContent(component: GameComponent, modifier: Modifier) {
         else {
             Column(verticalArrangement = Arrangement.SpaceAround) {
                 HomeHeader(modifier.fillMaxWidth().height(60.dp), 60.dp.toPx()) {
-                    GameHeader(state = state)
+                    GameHeader(state = state) {
+                        component.onIntent(TimeOver)
+                    }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 GameBody(component, state)
@@ -78,7 +83,7 @@ fun GameBody(component: GameComponent, state: GameState) {
 }
 
 @Composable
-fun GameHeader(modifier: Modifier = Modifier, state: GameState) {
+fun GameHeader(modifier: Modifier = Modifier, state: GameState, onTimeCompleted: () -> Unit) {
     Row(modifier, horizontalArrangement = Arrangement.SpaceBetween) {
         if (state.isDrawing) {
             TimerCountDown(
@@ -86,7 +91,8 @@ fun GameHeader(modifier: Modifier = Modifier, state: GameState) {
                 Color(Colors.TIMER_PROGRESS),
                 Color(Colors.TIMER_BACKGROUND),
                 state.currentTime.toFloat(),
-                state.totalTimeInSec
+                state.totalTimeInSec,
+                onTimeCompleted,
             )
             PlayersInfo(players = state.players)
         }

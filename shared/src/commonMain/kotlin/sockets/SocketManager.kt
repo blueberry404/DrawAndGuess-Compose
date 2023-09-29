@@ -12,8 +12,10 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import network.Constants.SOCKET_URL
 import network.User
+import sockets.SocketEvent.NewRound
 import sockets.SocketEvent.PrepareForGame
 import sockets.SocketEvent.RoomInfo
+import sockets.SocketEvent.RoundOver
 import sockets.SocketEvent.StartGame
 import sockets.SocketEvent.SyncDrawing
 import sockets.SocketEvent.UserJoined
@@ -30,6 +32,10 @@ object SocketManager: PlatformSocketListener {
 
     const val KEY_PREPARE_GAME = "PrepareGame"
     const val KEY_START_GAME = "StartGame"
+    const val KEY_END_GAME = "EndGame"
+    const val KEY_CORRECT_GUESS = "CorrectGuess"
+    const val KEY_WRONG_GUESS = "WrongGuess"
+    const val KEY_NEW_ROUND = "NewRound"
 
     init {
         user = keyValueStorage.user
@@ -162,6 +168,11 @@ object SocketManager: PlatformSocketListener {
                         listener?.onEvent(SyncDrawing(it))
                     }
                 }
+                "RoundOver" -> {
+                    val payload = socketMessage.payload
+                    listener?.onEvent(RoundOver(payload.wonRound, payload.userId))
+                }
+                "NewRound" -> listener?.onEvent(NewRound)
             }
         } catch (exception: SerializationException) {
             Napier.e { exception.message.orEmpty() }

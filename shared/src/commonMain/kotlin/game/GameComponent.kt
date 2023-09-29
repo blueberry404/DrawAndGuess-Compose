@@ -37,13 +37,19 @@ import network.DAGRepository
 import network.Resource
 import network.Room
 import network.RoomUser
+import network.User
 import sockets.SocketEvent
-import sockets.SocketEvent.GameOver
+import sockets.SocketEvent.NewRound
+import sockets.SocketEvent.RoundOver
 import sockets.SocketEvent.StartGame
 import sockets.SocketEvent.SyncDrawing
 import sockets.SocketEventsListener
 import sockets.SocketManager
+import sockets.SocketManager.KEY_CORRECT_GUESS
+import sockets.SocketManager.KEY_END_GAME
+import sockets.SocketManager.KEY_NEW_ROUND
 import sockets.SocketManager.KEY_START_GAME
+import sockets.SocketManager.KEY_WRONG_GUESS
 import kotlin.coroutines.CoroutineContext
 
 interface GameComponent {
@@ -77,6 +83,7 @@ class DefaultGameComponent(
     private var words: List<String> = emptyList()
     private lateinit var countDownTimer: CountDownTimer
     private var syncJob: Job? = null
+    private lateinit var user: User
 
     //Component is originator
     private val canvasCommand = CanvasCommand()
@@ -139,6 +146,18 @@ class DefaultGameComponent(
                 _uiState.update { it.copy(roundState = Drawing) }
                 startJobForCanvasSync()
             }
+            GameIntent.TimeOver -> {
+                _uiState.update {
+                    it.copy(
+                        roundState = RoundState.TimeOver,
+                        gameOverMessage = "Time's up!!"
+                    )
+                }
+                syncJob?.cancel()
+                if (roomInfo.isAdmin) {
+                    SocketManager.signalForGame(KEY_END_GAME)
+                }
+            }
         }
     }
 
@@ -154,12 +173,17 @@ class DefaultGameComponent(
         if (word.actual.length > guessed.length) {
             _uiState.update { it.copy(word = GameWord(word.actual, guessed)) }
         } else if (isCorrectGuess(word.actual, guessed)) {
-            // inform server
-            _uiState.update { it.copy(word = GameWord(word.actual, guessed)) }
-            println("WON!!!!")
+            _uiState.update {
+                it.copy(
+                    word = GameWord(word.actual, guessed),
+                    roundState = RoundState.Ended,
+                    gameOverMessage = "You guessed the word!"
+                )
+            }
+            SocketManager.signalForGame(KEY_CORRECT_GUESS)
         } else if (isWrongGuess(word.actual, guessed)) {
             _uiState.update { it.copy(word = word.copy(guessed = guessed, wiggle = true)) }
-            println("OOPSS!!!")
+            SocketManager.signalForGame(KEY_WRONG_GUESS)
         }
     }
 
@@ -200,7 +224,7 @@ class DefaultGameComponent(
         scope.launch {
             val userResponse = repository.getUser()
             check(userResponse is Resource.Success)
-            val user = userResponse.data
+            user = userResponse.data
 
             val response = repository.getRoom(GlobalData.room.id)
             if (response is Resource.Success) {
@@ -252,13 +276,28 @@ class DefaultGameComponent(
         }.also { it.start() }
     }
 
+    private fun startTimerForRoundOverDisplay() {
+        syncJob?.cancel()
+        if (!roomInfo.isAdmin) return
+
+        countDownTimer = CountDownTimer(ROUND_OVER_DISPLAY_SECS) {
+            if (it == ROUND_OVER_DISPLAY_SECS) {
+                if (currentRound + 1 > roomInfo.gameRounds) {
+                    //Disconnect
+                } else {
+                    SocketManager.signalForGame(KEY_NEW_ROUND)
+                }
+            }
+        }.also { it.start() }
+    }
+
     private fun startJobForCanvasSync() {
         syncJob = scope.launch(Dispatchers.Default) {
-            while (_uiState.value.isDrawing) {
+            while (_uiState.value.isCurrentUserDrawing) {
                 canvasCommand.peek()?.let {
                     SocketManager.syncCanvas(it)
                 }
-                delay(1_500)
+                delay(700)
             }
         }
     }
@@ -281,13 +320,56 @@ class DefaultGameComponent(
                 StartGame -> {
                     _uiState.update { it.copy(roundState = Starting) }
                 }
-                GameOver -> {
-                    syncJob?.cancel()
-                }
                 is SyncDrawing -> {
                     drawingState = event.canvasState
                     _uiState.update { gameState ->
                         gameState.copy(polygons = event.canvasState.polygons)
+                    }
+                }
+                is RoundOver -> {
+                    if (event.isWinner != null) {
+                        val name: String? = if (event.winnerId == user.id)
+                            "You"
+                        else {
+                            roomInfo.users.find { it.id == event.winnerId.orEmpty() }?.username
+                        }
+                        if (name != null) {
+                            _uiState.update {
+                                it.copy(
+                                    roundState = RoundState.Ended,
+                                    gameOverMessage = "$name guessed the word!"
+                                )
+                            }
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                roundState = RoundState.TimeOver,
+                                gameOverMessage = "Time's up!!"
+                            )
+                        }
+                    }
+                    startTimerForRoundOverDisplay()
+                }
+                NewRound -> {
+                    currentRound++
+                    userTurn = roomInfo.users[currentRound - 1]
+                    val currentWord = words[currentRound - 1]
+                    val isCurrentUser = user.id == userTurn.id
+
+                    _uiState.update {
+                        it.copy(
+                            roundState = Choosing,
+                            isCurrentUser = isCurrentUser,
+                            currentTurnUserId = userTurn.id,
+                            currentUsername = userTurn.username,
+                            currentTime = 0,
+                            word = GameWord(actual = currentWord),
+                            gameOverMessage = "",
+                        )
+                    }
+                    if (isCurrentUser) {
+                        startTimerForChooseWordDisplay()
                     }
                 }
                 else -> {}
@@ -296,6 +378,7 @@ class DefaultGameComponent(
     }
 
     companion object {
-        private const val CHOOSE_DISPLAY_SECS = 3
+        private const val CHOOSE_DISPLAY_SECS = 5
+        private const val ROUND_OVER_DISPLAY_SECS = 5
     }
 }

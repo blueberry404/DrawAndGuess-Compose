@@ -1,6 +1,7 @@
 package game
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationEndReason.Finished
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -25,6 +26,7 @@ fun TimerCountDown(
     backgroundColor: Color,
     initialValue: Float = 0f,
     timeInSeconds: Int = 0,
+    onTimeFinished: () -> Unit,
 ) {
     val animatedSweepAngle = remember { Animatable(initialValue = initialValue) }
 
@@ -33,6 +35,7 @@ fun TimerCountDown(
             targetValue = 360f,
             animationSpec = tween(durationMillis = timeInSeconds * 1000, easing = EaseInOut)
         )
+        onTimeFinished()
     }
 
     Box(Modifier.size(60.dp)) {

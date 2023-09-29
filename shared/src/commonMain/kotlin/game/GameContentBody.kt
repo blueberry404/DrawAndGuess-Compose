@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,7 +31,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -38,6 +38,8 @@ import androidx.compose.ui.graphics.PointMode
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextAlign.Companion
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import core.Colors
@@ -91,6 +93,7 @@ fun GameBodyContent(
             onAnimationCompleted
         )
         state.isStarting -> GameStartViewContainer(Modifier.fillMaxSize(), startGame)
+        state.isTimeOver || state.isGameOver -> GameOverViewContainer(Modifier.fillMaxSize(), state)
         else -> {}
     }
 }
@@ -300,5 +303,25 @@ fun GameStartViewContainer(modifier: Modifier, startGame: () -> Unit) {
             ),
             textSize = 64.sp,
         ) { startGame() }
+    }
+}
+
+@Composable
+fun GameOverViewContainer(modifier: Modifier, state: GameState) {
+    Column(
+        modifier = modifier.padding(24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            state.gameOverMessage,
+            color = Color.White,
+            style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold),
+            textAlign = TextAlign.Center
+        )
+        Spacer(Modifier.height(64.dp))
+        Text("The word was:", fontSize = 18.sp, color = Color.White)
+        Spacer(Modifier.height(8.dp))
+        Text(state.word.actual, fontSize = 28.sp, color = Color.White)
     }
 }

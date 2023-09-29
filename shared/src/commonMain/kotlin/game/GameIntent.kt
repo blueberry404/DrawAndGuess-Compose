@@ -16,4 +16,5 @@ sealed class GameIntent {
     object Erase : GameIntent()
     object StateRestoreCompleted : GameIntent()
     object GameStart : GameIntent()
+    object TimeOver : GameIntent()
 }

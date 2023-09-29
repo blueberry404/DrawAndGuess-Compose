@@ -13,4 +13,5 @@ data class MessagePayload(
     val userIds: List<String>? = null,
     val error: String? = null,
     val canvasState: CanvasState? = null,
+    val wonRound: Boolean? = null,
 )

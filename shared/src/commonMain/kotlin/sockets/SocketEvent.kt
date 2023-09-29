@@ -9,5 +9,6 @@ sealed interface SocketEvent {
     object PrepareForGame: SocketEvent
     object StartGame: SocketEvent
     data class SyncDrawing(val canvasState: CanvasState): SocketEvent
-    object GameOver: SocketEvent
+    data class RoundOver(val isWinner: Boolean?, val winnerId: String?): SocketEvent
+    object NewRound: SocketEvent
 }
