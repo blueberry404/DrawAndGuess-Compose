@@ -26,6 +26,8 @@ import kotlinx.coroutines.launch
 import network.DAGRepository
 import network.Resource.Error
 import network.Resource.Success
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import sockets.SocketEvent
 import sockets.SocketEvent.UserJoined
 import sockets.SocketEventsListener
@@ -46,7 +48,8 @@ class DefaultCreateRoomComponent(
     private val roomMode: RoomContentMode,
     private val showWaitingLobby: () -> Unit,
     private val popScreen: () -> Unit,
-): CreateRoomComponent, ComponentContext by componentContext, LifecycleOwner, SocketEventsListener {
+) : CreateRoomComponent, ComponentContext by componentContext, LifecycleOwner, SocketEventsListener,
+    KoinComponent {
 
     private val scope = CoroutineScope(coroutineContext + SupervisorJob())
 
@@ -62,7 +65,7 @@ class DefaultCreateRoomComponent(
     private var _actions = Channel<CreateRoomAction>()
     val actions = _actions.receiveAsFlow()
 
-    private val repository = DAGRepository()
+    private val repository: DAGRepository by inject()
 
     private var hasRoomCreated = true
 
@@ -81,10 +84,12 @@ class DefaultCreateRoomComponent(
                 hasRoomCreated = false
                 _uiState.update { it.copy(roomName = intent.roomName) }
             }
+
             is OnRoomPasswordChanged -> {
                 hasRoomCreated = false
                 _uiState.update { it.copy(roomPassword = intent.password) }
             }
+
             CreateRoom -> checkData()
         }
     }
@@ -141,6 +146,7 @@ class DefaultCreateRoomComponent(
                     hasRoomCreated = true
                     connectSocket()
                 }
+
                 is Error -> {
                     showSnackbar(response.error)
                 }
@@ -160,6 +166,7 @@ class DefaultCreateRoomComponent(
                     hasRoomCreated = true
                     connectSocket()
                 }
+
                 is Error -> {
                     showSnackbar(response.error)
                 }

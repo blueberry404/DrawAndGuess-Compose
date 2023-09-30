@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import network.DAGRepository
 import network.Resource
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import sockets.SocketEvent
 import sockets.SocketEvent.PrepareForGame
 import sockets.SocketEvent.RoomInfo
@@ -39,13 +41,13 @@ class DefaultWaitingRoomComponent(
     coroutineContext: CoroutineContext,
     private val popScreen: () -> Unit,
     private val openGame: () -> Unit,
-): WaitingRoomComponent, ComponentContext by componentContext, SocketEventsListener {
+): WaitingRoomComponent, ComponentContext by componentContext, SocketEventsListener, KoinComponent {
 
     private var _uiState = MutableStateFlow(WaitingRoomState())
     override val uiState = _uiState.asStateFlow()
 
     private val room = GlobalData.room
-    private val repository = DAGRepository()
+    private val repository: DAGRepository by inject()
 
     private val scope = CoroutineScope(coroutineContext + SupervisorJob())
 

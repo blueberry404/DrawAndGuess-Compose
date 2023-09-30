@@ -42,4 +42,6 @@ dependencies {
     implementation("com.arkivanov.decompose:decompose:2.0.0-compose-experimental-alpha-02")
     implementation("com.arkivanov.decompose:extensions-compose-jetbrains:2.0.0-compose-experimental-alpha-02")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+    implementation("io.insert-koin:koin-core:3.4.0")
+    implementation("io.insert-koin:koin-android:3.4.0")
 }

@@ -38,6 +38,8 @@ import network.Resource
 import network.Room
 import network.RoomUser
 import network.User
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import sockets.SocketEvent
 import sockets.SocketEvent.NewRound
 import sockets.SocketEvent.RoundOver
@@ -62,14 +64,14 @@ interface GameComponent {
 class DefaultGameComponent(
     componentContext: ComponentContext,
     coroutineContext: CoroutineContext,
-) : GameComponent, ComponentContext by componentContext, SocketEventsListener {
+) : GameComponent, ComponentContext by componentContext, SocketEventsListener, KoinComponent {
 
     private var _uiState = MutableStateFlow(GameState())
 
     override val uiState: StateFlow<GameState>
         get() = _uiState.asStateFlow()
 
-    private val repository: DAGRepository = DAGRepository()
+    private val repository: DAGRepository by inject()
 
     override fun onIntent(intent: GameIntent) {
         handleIntent(intent)

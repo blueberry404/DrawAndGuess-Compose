@@ -11,7 +11,11 @@ struct iOSApp: App {
     var scenePhase: ScenePhase
     
     var lifecycleManager: LifecycleManager { appDelegate.lifecycleManager }
-    
+
+    init() {
+        KoinHelperKt.doInitKoin()
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()

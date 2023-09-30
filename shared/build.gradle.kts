@@ -35,6 +35,7 @@ kotlin {
 
     sourceSets {
         val ktor = "2.3.0"
+        val koin = "3.4.0"
 
         val commonMain by getting {
             dependencies {
@@ -69,6 +70,9 @@ kotlin {
                 implementation("com.russhwolf:multiplatform-settings-no-arg:$settings")
                 implementation("com.russhwolf:multiplatform-settings-serialization:$settings")
                 implementation("com.russhwolf:multiplatform-settings-coroutines:$settings")
+
+                implementation("io.insert-koin:koin-core:$koin")
+                implementation("io.insert-koin:koin-test:$koin")
             }
         }
         val androidMain by getting {

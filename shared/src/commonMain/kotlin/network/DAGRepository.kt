@@ -1,6 +1,6 @@
 package network
 
-import core.storage.DefaultKeyValueStorage
+import core.storage.KeyValueStorage
 import createroom.RoomStatus
 import createroom.RoomStatus.Unknown
 import home.GameMode
@@ -8,10 +8,10 @@ import io.github.aakira.napier.Napier
 import network.Resource.Error
 import network.Resource.Success
 
-class DAGRepository {
-
-    private val service = DAGRestService()
-    private val keyValueStorage = DefaultKeyValueStorage()
+class DAGRepository(
+    private val service: DAGRestService,
+    private val keyValueStorage: KeyValueStorage,
+) {
 
     suspend fun getUser(): Resource<User> {
         val user = keyValueStorage.user
