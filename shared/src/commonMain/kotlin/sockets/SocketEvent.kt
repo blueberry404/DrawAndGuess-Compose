@@ -1,6 +1,6 @@
 package sockets
 
-import game.CanvasState
+import ui.game.models.CanvasState
 
 sealed interface SocketEvent {
     data class UserJoined(val userIds: List<String>): SocketEvent

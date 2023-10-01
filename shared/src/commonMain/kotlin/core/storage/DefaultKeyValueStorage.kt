@@ -3,7 +3,7 @@ package core.storage
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.serialization.decodeValueOrNull
 import com.russhwolf.settings.serialization.encodeValue
-import network.User
+import models.User
 
 class DefaultKeyValueStorage: KeyValueStorage {
     private val settings: Settings by lazy { Settings() }

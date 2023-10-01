@@ -1,4 +1,4 @@
 import androidx.compose.runtime.Composable
-import root.DAGRootComponent
+import ui.root.DAGRootComponent
 
 @Composable fun MainView(rootComponent: DAGRootComponent) = App(rootComponent)

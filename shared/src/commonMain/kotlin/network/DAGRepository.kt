@@ -1,12 +1,20 @@
 package network
 
 import core.storage.KeyValueStorage
-import createroom.RoomStatus
-import createroom.RoomStatus.Unknown
-import home.GameMode
+import models.RoomStatus
+import models.RoomStatus.Unknown
+import models.GameMode
 import io.github.aakira.napier.Napier
+import models.Room
+import models.RoomUser
+import models.User
 import network.Resource.Error
 import network.Resource.Success
+import network.request.CreateRoomRequest
+import network.request.GetUsersInfoRequest
+import network.request.JoinRoomRequest
+import network.response.RemoteRoom
+import network.response.RemoteRoomUser
 
 class DAGRepository(
     private val service: DAGRestService,

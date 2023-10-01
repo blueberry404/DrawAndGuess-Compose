@@ -1,6 +1,6 @@
 package core
 
-import network.Room
+import models.Room
 
 object GlobalData {
     var room: Room = Room()

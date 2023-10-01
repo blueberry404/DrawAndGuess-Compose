@@ -2,16 +2,16 @@ package sockets
 
 import core.GlobalData
 import core.storage.DefaultKeyValueStorage
-import createroom.RoomContentMode
-import createroom.RoomContentMode.Create
-import game.CanvasState
+import models.RoomContentMode
+import models.RoomContentMode.Create
+import ui.game.models.CanvasState
 import io.github.aakira.napier.Napier
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import network.Constants.SOCKET_URL
-import network.User
+import models.User
 import sockets.SocketEvent.NewRound
 import sockets.SocketEvent.PrepareForGame
 import sockets.SocketEvent.RoomInfo

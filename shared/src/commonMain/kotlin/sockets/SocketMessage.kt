@@ -1,6 +1,6 @@
 package sockets
 
-import game.CanvasState
+import ui.game.models.CanvasState
 import kotlinx.serialization.Serializable
 
 @Serializable

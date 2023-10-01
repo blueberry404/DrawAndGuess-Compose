@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.arkivanov.decompose.defaultComponentContext
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
-import root.DefaultDAGRootComponent
+import ui.root.DefaultDAGRootComponent
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,6 +1,6 @@
 package core.storage
 
-import network.User
+import models.User
 
 interface KeyValueStorage {
 
