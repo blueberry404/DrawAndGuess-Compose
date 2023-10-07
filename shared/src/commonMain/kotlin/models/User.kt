@@ -10,4 +10,5 @@ data class User(
     val avatarColor: String = "#000000",
 ) {
     fun getInitials() = userName.getInitials()
+    fun isInvalid() = id.isEmpty()
 }

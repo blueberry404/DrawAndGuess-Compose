@@ -23,8 +23,8 @@ class DAGRepository(
 
     suspend fun getUser(): Resource<User> {
         val user = keyValueStorage.user
-        Napier.d { "User not found" }
-        val resource: Resource<User> = if (user == null) {
+        checkNotNull(user)
+        val resource: Resource<User> = if (user.isInvalid()) {
             val response = service.createGuestUser()
             if (response is Success) {
                 val remoteUser = response.data
@@ -43,7 +43,8 @@ class DAGRepository(
 
     suspend fun createRoom(name: String, password: String, mode: String): Resource<Room> {
         val user = keyValueStorage.user
-        val result: Resource<Room> = if (user == null) {
+        checkNotNull(user)
+        val result: Resource<Room> = if (user.isInvalid()) {
             Error("Some error occurred. Try reopening the app with internet on")
         } else {
             val createRoomRequest = CreateRoomRequest(user.id, name, password, mode)
@@ -61,7 +62,8 @@ class DAGRepository(
 
     suspend fun joinRoom(name: String, password: String): Resource<Room> {
         val user = keyValueStorage.user
-        val result = if (user == null) {
+        checkNotNull(user)
+        val result = if (user.isInvalid()) {
             Error("Some error occurred. Try reopening the app with internet on")
         } else {
             val joinRoomRequest = JoinRoomRequest(user.id, name, password)
@@ -91,7 +93,8 @@ class DAGRepository(
 
     suspend fun getRoom(roomId: String): Resource<Room> {
         val user = keyValueStorage.user
-        val result = if (user == null) {
+        checkNotNull(user)
+        val result = if (user.isInvalid()) {
             Error("Some error occurred. Try reopening the app with internet on")
         } else {
             val response = service.getRoom(roomId)
