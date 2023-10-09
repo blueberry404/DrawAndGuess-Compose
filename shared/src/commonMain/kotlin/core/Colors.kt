@@ -26,6 +26,8 @@ object Colors {
     const val GUESS_BOX = 0xffde513c
     const val KEYBOARD_BACKGROUND = 0x991c3170
     const val BORDER_PALETTE_COLOR = 0xffd1eaf0
+    const val DIALOG_DULL_BACKGROUND = 0x4D000000
+    const val DIALOG_BACKGROUND = 0xffEEEEEE
 
     const val PAINT_OLIVE = 0xff808000
     const val PAINT_PURPLE = 0xff800080

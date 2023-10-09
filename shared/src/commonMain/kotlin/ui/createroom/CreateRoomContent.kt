@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Snackbar
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,12 +25,14 @@ import androidx.compose.ui.unit.dp
 import core.Images
 import core.getAppGradient
 import core.widgets.DAGButton
+import core.widgets.DAGDialogView
 import core.widgets.GameLogo
 import ui.createroom.CreateRoomIntent.CreateRoom
 import ui.createroom.CreateRoomIntent.OnRoomNameChanged
 import ui.createroom.CreateRoomIntent.OnRoomPasswordChanged
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import ui.createroom.CreateRoomIntent.DismissDialog
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -40,9 +40,9 @@ fun CreateRoomContent(component: CreateRoomComponent, modifier: Modifier) {
 
     val state by component.uiState.collectAsState()
 
-    Box(modifier = modifier.fillMaxSize().background(brush = getAppGradient()).padding(32.dp)) {
+    Box(modifier = modifier.fillMaxSize().background(brush = getAppGradient())) {
         Column(
-            modifier = modifier.fillMaxSize()
+            modifier = modifier.fillMaxSize().padding(32.dp)
         ) {
             Row(horizontalArrangement = Arrangement.Start) {
                 Image(
@@ -79,10 +79,11 @@ fun CreateRoomContent(component: CreateRoomComponent, modifier: Modifier) {
                 }
             }
         }
-        if (state.showSnackBar) {
-            Snackbar(modifier = Modifier.align(Alignment.BottomStart)) {
-                Text(state.errorMessage)
-            }
-        }
+        DAGDialogView(
+            modifier = Modifier.fillMaxSize(),
+            info = state.dialogInfo,
+            onPositiveClicked = {
+                component.onIntent(DismissDialog)
+            })
     }
 }

@@ -4,6 +4,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleOwner
 import com.arkivanov.essenty.lifecycle.subscribe
 import core.GlobalData
+import core.widgets.DAGDialogInfo
 import ui.createroom.CreateRoomAction.ShowWaitingLobby
 import ui.createroom.CreateRoomIntent.CreateRoom
 import ui.createroom.CreateRoomIntent.OnRoomNameChanged
@@ -16,7 +17,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -33,6 +33,7 @@ import sockets.SocketEvent
 import sockets.SocketEvent.UserJoined
 import sockets.SocketEventsListener
 import sockets.SocketManager
+import ui.createroom.CreateRoomIntent.DismissDialog
 import kotlin.coroutines.CoroutineContext
 
 interface CreateRoomComponent {
@@ -91,6 +92,11 @@ class DefaultCreateRoomComponent(
                 _uiState.update { it.copy(roomPassword = intent.password) }
             }
 
+            DismissDialog -> {
+                _uiState.update {
+                    it.copy(dialogInfo = DAGDialogInfo(showDialog = false))
+                }
+            }
             CreateRoom -> checkData()
         }
     }
@@ -180,10 +186,14 @@ class DefaultCreateRoomComponent(
     }
 
     private fun showSnackbar(message: String) {
-        _uiState.update { it.copy(showSnackBar = true, errorMessage = message) }
-        scope.launch {
-            delay(2000)
-            _uiState.update { it.copy(showSnackBar = false, errorMessage = "") }
+        _uiState.update {
+            it.copy(
+                dialogInfo = DAGDialogInfo(
+                    message = message,
+                    buttonTitlePositive = "OK",
+                    showDialog = true,
+                )
+            )
         }
     }
 
