@@ -28,6 +28,7 @@ object Colors {
     const val BORDER_PALETTE_COLOR = 0xffd1eaf0
     const val DIALOG_DULL_BACKGROUND = 0x4D000000
     const val DIALOG_BACKGROUND = 0xffEEEEEE
+    const val TEXT_COLOR_YELLOW = 0xFFF6BE00
 
     const val PAINT_OLIVE = 0xff808000
     const val PAINT_PURPLE = 0xff800080

@@ -52,7 +52,7 @@ fun RoomPasswordInput(inputText: String = "", maxChars: Int, onTextChanged: (Str
         ),
         singleLine = true,
         colors = TextFieldDefaults.textFieldColors(
-            textColor = Color(Colors.PRIMARY_TEXT),
+            textColor = Color(Colors.TEXT_COLOR_YELLOW),
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
         ),

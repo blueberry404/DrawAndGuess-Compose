@@ -57,7 +57,7 @@ fun RoomNameInput(
         ),
         singleLine = true,
         colors = TextFieldDefaults.textFieldColors(
-            textColor = Color(Colors.PRIMARY_TEXT),
+            textColor = Color(Colors.TEXT_COLOR_YELLOW),
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
         ),
