@@ -14,11 +14,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import core.Colors.DIALOG_BACKGROUND
 import core.Colors.DIALOG_DULL_BACKGROUND
 
@@ -34,9 +35,9 @@ fun DAGDialogView(
         Box(
             modifier = modifier.background(Color(DIALOG_DULL_BACKGROUND))
                 .clickable {
-                           if (info.cancellable) {
-                               onDismiss()
-                           }
+                    if (info.cancellable) {
+                        onDismiss()
+                    }
                 },
             contentAlignment = Alignment.Center
         ) {
@@ -52,7 +53,13 @@ fun DAGDialogView(
                     ) {
                         val buttonModifier = Modifier.width(150.dp).height(48.dp)
                         if (info.title.isNotEmpty()) {
-                            Text(info.title, color = Color.Black)
+                            Text(
+                                info.title,
+                                color = Color.Black,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp
+                            )
+                            Spacer(Modifier.height(16.dp))
                         }
                         Text(info.message, color = Color.Black)
                         Spacer(Modifier.height(32.dp))

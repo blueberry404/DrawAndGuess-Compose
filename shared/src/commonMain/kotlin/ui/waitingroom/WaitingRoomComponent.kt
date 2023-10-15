@@ -2,8 +2,10 @@ package ui.waitingroom
 
 import androidx.compose.ui.graphics.Color
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.essenty.backhandler.BackCallback
 import com.arkivanov.essenty.lifecycle.subscribe
 import core.GlobalData
+import core.widgets.DAGDialogInfo
 import models.AvatarInfo
 import models.GameMode.Many
 import models.GameMode.Single
@@ -16,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import models.RoomContentMode.Leave
 import network.DAGRepository
 import network.Resource
 import org.koin.core.component.KoinComponent
@@ -34,6 +37,8 @@ interface WaitingRoomComponent {
 
     val uiState: StateFlow<WaitingRoomState>
     fun onBackPressed()
+    fun exitRoom()
+    fun dismissDialog()
 }
 
 class DefaultWaitingRoomComponent(
@@ -51,8 +56,13 @@ class DefaultWaitingRoomComponent(
 
     private val scope = CoroutineScope(coroutineContext + SupervisorJob())
 
+    private val backCallback = BackCallback {
+        showDialog()
+    }
+
     init {
         subscribeLifecycle()
+        backHandler.register(backCallback)
         _uiState.value = WaitingRoomState(isLoading = true, roomName = room.name)
         getUsers()
     }
@@ -68,8 +78,16 @@ class DefaultWaitingRoomComponent(
         })
     }
 
-    override fun onBackPressed() {
-        popScreen()
+    private fun showDialog() {
+        val info = DAGDialogInfo(
+            title = "WAIT",
+            message = "Do you want to leave the room?",
+            buttonTitlePositive = "Yes",
+            buttonTitleNegative = "No",
+            showDialog = true,
+            cancellable = false,
+        )
+        _uiState.update { it.copy(dialogInfo = info) }
     }
 
     private fun getUsers() {
@@ -118,6 +136,20 @@ class DefaultWaitingRoomComponent(
 
     private fun startGame() {
         SocketManager.signalForGame(KEY_PREPARE_GAME)
+    }
+
+    override fun onBackPressed() {
+        showDialog()
+    }
+
+    override fun exitRoom() {
+        SocketManager.requestForRoom(Leave)
+        SocketManager.disconnect()
+        popScreen()
+    }
+
+    override fun dismissDialog() {
+        _uiState.update { it.copy(dialogInfo = DAGDialogInfo()) }
     }
 
     override fun onConnected() {

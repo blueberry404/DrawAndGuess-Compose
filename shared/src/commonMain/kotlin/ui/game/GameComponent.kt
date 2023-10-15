@@ -2,6 +2,7 @@ package ui.game
 
 import androidx.compose.ui.graphics.Color
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.essenty.backhandler.BackCallback
 import com.arkivanov.essenty.lifecycle.subscribe
 import core.CountDownTimer
 import core.GlobalData
@@ -80,6 +81,10 @@ class DefaultGameComponent(
 
     private val repository: DAGRepository by inject()
 
+    private val backCallback = BackCallback {
+        Napier.d { "Back button disabled" }
+    }
+
     override fun onIntent(intent: GameIntent) {
         handleIntent(intent)
     }
@@ -100,6 +105,7 @@ class DefaultGameComponent(
 
     init {
         subscribeLifecycle()
+        backHandler.register(backCallback)
         getRoomInfo()
     }
 

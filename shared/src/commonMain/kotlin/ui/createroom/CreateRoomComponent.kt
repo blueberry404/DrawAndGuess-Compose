@@ -126,7 +126,7 @@ class DefaultCreateRoomComponent(
         if (isValid()) {
             request()
         } else {
-            showSnackbar("Both should be min 6 letters")
+            showDialog("Both should be min 6 letters")
         }
     }
 
@@ -155,7 +155,7 @@ class DefaultCreateRoomComponent(
                 }
 
                 is Error -> {
-                    showSnackbar(response.error)
+                    showDialog(response.error)
                 }
             }
         }
@@ -175,7 +175,7 @@ class DefaultCreateRoomComponent(
                 }
 
                 is Error -> {
-                    showSnackbar(response.error)
+                    showDialog(response.error)
                 }
             }
         }
@@ -185,7 +185,7 @@ class DefaultCreateRoomComponent(
         SocketManager.connect()
     }
 
-    private fun showSnackbar(message: String) {
+    private fun showDialog(message: String) {
         _uiState.update {
             it.copy(
                 dialogInfo = DAGDialogInfo(
@@ -204,16 +204,17 @@ class DefaultCreateRoomComponent(
     }
 
     private fun postSocketConnection() {
+        hasRoomCreated = false
         repository.getCurrentUser()?.let { user ->
             if (roomMode == Create) {
                 SocketManager.addDefaultRoomUser(user.id)
-                SocketManager.enterUserToRoom(roomMode)
+                SocketManager.requestForRoom(roomMode)
                 performAction(ShowWaitingLobby)
             } else {
-                SocketManager.enterUserToRoom(roomMode)
+                SocketManager.requestForRoom(roomMode)
             }
         } ?: run {
-            showSnackbar("Some error occurred")
+            showDialog("Some error occurred")
         }
     }
 
@@ -232,7 +233,7 @@ class DefaultCreateRoomComponent(
     }
 
     override fun onFailure(reason: String) {
-        showSnackbar(reason)
+        showDialog(reason)
     }
 
     override fun onEvent(event: SocketEvent) {

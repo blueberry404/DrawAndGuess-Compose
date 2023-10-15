@@ -2,6 +2,7 @@ package ui.waitingroom
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import core.Colors
 import core.getAppGradient
+import core.widgets.DAGDialogView
 import core.widgets.GameLogo
 
 @Composable
@@ -27,10 +29,10 @@ fun WaitingRoomContent(component: WaitingRoomComponent, modifier: Modifier) {
 
     val state by component.uiState.collectAsState()
 
-    Column(modifier = modifier.fillMaxSize().background(brush = getAppGradient()).padding(32.dp)) {
+    Box(modifier = modifier.fillMaxSize().background(brush = getAppGradient())) {
         Column(
+            modifier = modifier.fillMaxSize().padding(32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceAround,
         ) {
             Spacer(Modifier.height(16.dp))
             GameLogo()
@@ -42,6 +44,15 @@ fun WaitingRoomContent(component: WaitingRoomComponent, modifier: Modifier) {
                 state.users
             )
         }
+        DAGDialogView(
+            modifier = Modifier.fillMaxSize(),
+            info = state.dialogInfo,
+            onPositiveClicked = {
+                component.exitRoom()
+            },
+            onNegativeClicked = {
+                component.dismissDialog()
+            })
     }
 }
 

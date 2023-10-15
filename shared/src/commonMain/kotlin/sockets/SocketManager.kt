@@ -10,6 +10,8 @@ import kotlinx.serialization.SerializationException
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import models.RoomContentMode.Join
+import models.RoomContentMode.Leave
 import network.Constants.SOCKET_URL
 import models.User
 import sockets.SocketEvent.NewRound
@@ -53,22 +55,30 @@ object SocketManager: PlatformSocketListener {
         platformSocket.connectSocket(this)
     }
 
+    fun disconnect() {
+        platformSocket.cleanup()
+    }
+
     fun addDefaultRoomUser(userId: String) {
         userIds = listOf(userId)
     }
 
     fun getRoomUserIds() = userIds
 
-    fun enterUserToRoom(roomContentMode: RoomContentMode) {
+    fun requestForRoom(roomContentMode: RoomContentMode) {
         val roomId = GlobalData.room.id
         val payload = MessagePayload(
             userId = user?.id.orEmpty(),
             roomId = roomId
         )
-        val type = if (roomContentMode == Create) "create" else "join"
+        val type = when (roomContentMode) {
+            Create -> "create"
+            Join -> "join"
+            Leave -> "leave"
+        }
         val message = SocketMessage(type, payload)
         val json = Json.encodeToString(message)
-        Napier.d { "Socket:: join user:: $json" }
+        Napier.d { "Socket:: requestForRoom:: $json" }
         platformSocket.sendMessage(json)
     }
 

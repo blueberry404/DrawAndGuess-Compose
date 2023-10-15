@@ -12,13 +12,11 @@ import network.Constants.ROOM_ID
 import network.Constants.SOCKET_RECONNECTION
 import network.Constants.USER_ID
 import okhttp3.OkHttpClient
-import okhttp3.WebSocket
 import okhttp3.Request
 import okhttp3.Response
+import okhttp3.WebSocket
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.io.IOException
-import java.net.SocketException
 
 actual class PlatformSocket actual constructor(url: String): KoinComponent {
 
@@ -71,6 +69,7 @@ actual class PlatformSocket actual constructor(url: String): KoinComponent {
     }
 
     private fun checkFailure(t: Throwable) {
+        if (t.message.orEmpty().contains("Socket closed")) return
         cleanup()
         if (retryCount == Constants.RETRY_LIMIT) {
             listener?.onFailure(Throwable("Connection Error"))
