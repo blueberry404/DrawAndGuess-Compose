@@ -47,6 +47,7 @@ import models.GameMode.Single
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun HomeContent(component: HomeComponent, modifier: Modifier) {
     val state by component.state.collectAsState()
@@ -99,7 +100,7 @@ fun HeaderContent(userInfo: HomeUserInfo) {
         Spacer(Modifier.width(8.dp))
         Text(
             text = userInfo.welcomeText,
-            style = MaterialTheme.typography.body2,
+            style = MaterialTheme.typography.subtitle2,
             color = Color(Colors.PRIMARY_TEXT)
         )
     }
@@ -138,28 +139,12 @@ fun GameOptionsCard1(createRoom: (GameMode) -> Unit) {
                 modifier = Modifier.width(120.dp).aspectRatio(1.0f).align(Alignment.TopStart)
                     .offset(y = (-40).dp, x = 16.dp),
             )
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Spacer(modifier = Modifier.weight(1f))
-                Column(
-                    modifier = Modifier.weight(2f).fillMaxWidth().padding(16.dp),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "Turn Based 1 on 1",
-                        style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold),
-                        color = Color(Colors.PRIMARY_TEXT)
-                    )
-                    Text(
-                        text = "Exchange doodle art with a friend",
-                        style = MaterialTheme.typography.body2,
-                        color = Color(Colors.PRIMARY_TEXT)
-                    )
-                }
-            }
+            CardText("Turn Based 1 on 1", "Exchange doodle art with a friend")
         }
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun GameOptionsCard2(createRoom: (GameMode) -> Unit) {
     Box(
@@ -182,24 +167,29 @@ fun GameOptionsCard2(createRoom: (GameMode) -> Unit) {
                 modifier = Modifier.width(120.dp).aspectRatio(1.0f).align(Alignment.TopStart)
                     .offset(y = (-40).dp, x = 16.dp),
             )
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Spacer(modifier = Modifier.weight(1f))
-                Column(
-                    modifier = Modifier.weight(2f).fillMaxWidth().padding(16.dp),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "Play with Friends",
-                        style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold),
-                        color = Color(Colors.PRIMARY_TEXT)
-                    )
-                    Text(
-                        text = "Challenge upto 5 friends for a quick match",
-                        style = MaterialTheme.typography.body2,
-                        color = Color(Colors.PRIMARY_TEXT)
-                    )
-                }
-            }
+            CardText("Play with Friends", "Challenge upto 5 friends for a quick match")
+        }
+    }
+}
+
+@Composable
+fun CardText(text1: String, text2: String) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Spacer(modifier = Modifier.weight(1f))
+        Column(
+            modifier = Modifier.weight(2f).fillMaxWidth().padding(16.dp),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = text1,
+                style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold),
+                color = Color(Colors.PRIMARY_TEXT)
+            )
+            Text(
+                text = text2,
+                style = MaterialTheme.typography.body2,
+                color = Color(Colors.PRIMARY_TEXT)
+            )
         }
     }
 }
@@ -226,7 +216,7 @@ fun JoinTeamCard(joinRoomClicked: () -> Unit) {
             horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Have Code?", style = MaterialTheme.typography.subtitle1,
+                text = "Have Code?  ", style = MaterialTheme.typography.body1,
                 color = Color(Colors.PRIMARY_TEXT)
             )
             Text(

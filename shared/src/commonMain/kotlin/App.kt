@@ -6,13 +6,14 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import core.createTypography
 import core.getAppGradient
 import ui.root.DAGRootComponent
 import ui.root.RootContent
 
 @Composable
 fun App(rootComponent: DAGRootComponent) {
-    MaterialTheme {
+    MaterialTheme(typography = createTypography()) {
         Box(
             Modifier.fillMaxSize()
                 .background(brush = getAppGradient())

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -38,8 +39,8 @@ fun AvatarView(modifier: Modifier, info: AvatarInfo) {
         Text(
             text = info.initials,
             fontSize = 12.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = Color(Colors.PRIMARY_TEXT)
+            color = Color(Colors.PRIMARY_TEXT),
+            style = MaterialTheme.typography.caption
         )
     }
 }

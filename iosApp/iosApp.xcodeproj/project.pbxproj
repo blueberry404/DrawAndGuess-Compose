@@ -13,6 +13,9 @@
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 		842B5BA62A070BCB00F97CFA /* LifecycleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842B5BA52A070BCB00F97CFA /* LifecycleManager.swift */; };
 		842B5BAE2A084F4D00F97CFA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842B5BAD2A084F4D00F97CFA /* AppDelegate.swift */; };
+		84ACC6052AE1C1E500E5B2DA /* montserrat_regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 84ACC6022AE1C1E500E5B2DA /* montserrat_regular.ttf */; };
+		84ACC6072AE1C1E500E5B2DA /* montserrat_bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 84ACC6042AE1C1E500E5B2DA /* montserrat_bold.ttf */; };
+		84ACC6092AE1C9D100E5B2DA /* handmade.otf in Resources */ = {isa = PBXBuildFile; fileRef = 84ACC6082AE1C9D100E5B2DA /* handmade.otf */; };
 		CFDB58B53BB94DE262B13C24 /* Pods_iosApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6B1049432C0C2B312090ABF6 /* Pods_iosApp.framework */; };
 /* End PBXBuildFile section */
 
@@ -28,6 +31,9 @@
 		842B5BA52A070BCB00F97CFA /* LifecycleManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifecycleManager.swift; sourceTree = "<group>"; };
 		842B5BA92A08292800F97CFA /* iosApp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "iosApp-Bridging-Header.h"; sourceTree = "<group>"; };
 		842B5BAD2A084F4D00F97CFA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		84ACC6022AE1C1E500E5B2DA /* montserrat_regular.ttf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = montserrat_regular.ttf; sourceTree = "<group>"; };
+		84ACC6042AE1C1E500E5B2DA /* montserrat_bold.ttf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = montserrat_bold.ttf; sourceTree = "<group>"; };
+		84ACC6082AE1C9D100E5B2DA /* handmade.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = handmade.otf; sourceTree = "<group>"; };
 		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		FF8CA3F5360CEAB49D74065F /* Pods-iosApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.release.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -82,6 +88,9 @@
 		7555FF7D242A565900829871 /* iosApp */ = {
 			isa = PBXGroup;
 			children = (
+				84ACC6082AE1C9D100E5B2DA /* handmade.otf */,
+				84ACC6042AE1C1E500E5B2DA /* montserrat_bold.ttf */,
+				84ACC6022AE1C1E500E5B2DA /* montserrat_regular.ttf */,
 				058557BA273AAA24004C7B11 /* Assets.xcassets */,
 				7555FF82242A565900829871 /* ContentView.swift */,
 				7555FF8C242A565B00829871 /* Info.plist */,
@@ -172,6 +181,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84ACC6092AE1C9D100E5B2DA /* handmade.otf in Resources */,
+				84ACC6052AE1C1E500E5B2DA /* montserrat_regular.ttf in Resources */,
+				84ACC6072AE1C1E500E5B2DA /* montserrat_bold.ttf in Resources */,
 				058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */,
 				058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */,
 			);
