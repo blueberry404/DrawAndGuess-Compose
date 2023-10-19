@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="DAGTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:statusBarColor">#182851</item>
+        <item name="android:statusBarColor">@color/blue</item>
+        <item name="android:windowBackground">@drawable/launcher_background</item>
     </style>
 </resources>
