@@ -22,6 +22,18 @@ fun createTypography(): Typography {
     )
 
     return Typography(
+        h3 = TextStyle(
+            fontFamily = montserratBold,
+            fontSize = 42.sp,
+        ),
+        h4 = TextStyle(
+            fontFamily = montserratBold,
+            fontSize = 34.sp,
+        ),
+        h5 = TextStyle(
+            fontFamily = montserratReg,
+            fontSize = 24.sp,
+        ),
         h6 = TextStyle(
             fontFamily = montserratBold,
             fontSize = 20.sp,
@@ -38,12 +50,12 @@ fun createTypography(): Typography {
         ),
         body1 = TextStyle(
             fontFamily = handmade,
-            fontWeight = FontWeight.Normal,
+            fontWeight = FontWeight.Bold,
             fontSize = 24.sp,
         ),
         body2 = TextStyle(
             fontFamily = handmade,
-            fontWeight = FontWeight.Normal,
+            fontWeight = FontWeight.Bold,
             fontSize = 20.sp,
         ),
         caption = TextStyle(

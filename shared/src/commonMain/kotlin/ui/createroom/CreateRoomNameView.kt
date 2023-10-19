@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.LocalTextStyle
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -28,7 +29,7 @@ fun RoomNameInputView(inputText: String = "", onTextChanged: (String) -> Unit) {
         Text(
             modifier = Modifier.weight(1f),
             text = "Room Name",
-            fontSize = 18.sp,
+            style = MaterialTheme.typography.subtitle2,
             color = Color(Colors.PRIMARY_TEXT)
         )
         InputView(Modifier.fillMaxWidth().weight(1f)) {
@@ -61,6 +62,6 @@ fun RoomNameInput(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
         ),
-        textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
+        textStyle = MaterialTheme.typography.subtitle1.copy(textAlign = TextAlign.Center)
     )
 }

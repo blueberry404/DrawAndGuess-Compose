@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -99,9 +100,9 @@ fun GameStartView(
             ) {
                 Text(
                     text = textDisplayed.value,
+                    style = MaterialTheme.typography.h3,
                     fontSize = textSize,
                     color = colors[index],
-                    fontWeight = FontWeight.Bold,
                 )
             }
     }

@@ -31,7 +31,7 @@ fun WaitingRoomContent(component: WaitingRoomComponent, modifier: Modifier) {
 
     Box(modifier = modifier.fillMaxSize().background(brush = getAppGradient())) {
         Column(
-            modifier = modifier.fillMaxSize().padding(32.dp),
+            modifier = modifier.fillMaxSize().padding(top = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(Modifier.height(16.dp))
@@ -40,7 +40,7 @@ fun WaitingRoomContent(component: WaitingRoomComponent, modifier: Modifier) {
             LobbyHeader(state.roomName)
             Spacer(Modifier.height(8.dp))
             WaitingRoomList(
-                Modifier.fillMaxWidth().wrapContentHeight(),
+                Modifier.fillMaxWidth().wrapContentHeight().padding(horizontal = 32.dp),
                 state.users
             )
         }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -58,8 +59,7 @@ fun KeyboardRow(modifier: Modifier, letters: List<Char>, onKeyPressed: (Char) ->
                 ) {
                     Text(
                         text = if (it == '!') "\u232B" else it.toString(),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        style = MaterialTheme.typography.h6,
                     )
                 }
             }

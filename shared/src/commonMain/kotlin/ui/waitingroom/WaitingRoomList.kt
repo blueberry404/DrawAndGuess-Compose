@@ -37,13 +37,12 @@ fun WaitingRoomList(modifier: Modifier, users: List<WaitingUser>) {
 @Composable
 fun WaitingUserRow(modifier: Modifier, user: WaitingUser) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
-        AvatarView(Modifier.width(36.dp), user.info)
+        AvatarView(info = user.info)
         Spacer(Modifier.width(16.dp))
         Text(
             text = user.name,
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.subtitle1,
             color = Color(Colors.PRIMARY_TEXT),
-            fontWeight = FontWeight.SemiBold,
         )
     }
 }
@@ -62,7 +61,7 @@ fun WaitingOthersRow(modifier: Modifier) {
         Spacer(Modifier.width(16.dp))
         Text(
             text = "Waiting for others...",
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.subtitle2,
             color = Color.White
         )
     }

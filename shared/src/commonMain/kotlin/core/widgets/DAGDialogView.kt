@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -56,7 +57,7 @@ fun DAGDialogView(
                             Text(
                                 info.title,
                                 color = Color.Black,
-                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.h6,
                                 fontSize = 16.sp
                             )
                             Spacer(Modifier.height(16.dp))

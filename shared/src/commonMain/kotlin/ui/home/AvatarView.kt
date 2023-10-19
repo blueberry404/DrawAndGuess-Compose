@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -22,9 +23,9 @@ import core.Colors
 import models.AvatarInfo
 
 @Composable
-fun AvatarView(modifier: Modifier, info: AvatarInfo) {
+fun AvatarView(modifier: Modifier = Modifier, info: AvatarInfo) {
     Column(
-        modifier = modifier
+        modifier = modifier.size(36.dp)
             .drawBehind {
                 drawCircle(
                     Color.White, style = Stroke(

@@ -97,7 +97,7 @@ class DefaultWaitingRoomComponent(
                 val users = response.data.map {
                     val color = Color(("ff" + it.avatarColor.removePrefix("#").lowercase()).toLong(16))
                     WaitingUser(
-                        it.id, it.username.uppercase(), AvatarInfo(
+                        it.id, it.username, AvatarInfo(
                             it.id, it.getInitials(), color
                         )
                     )

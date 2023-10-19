@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -75,18 +76,18 @@ fun PlayerItem(modifier: Modifier = Modifier, player: Player) {
             } else {
                 Text(
                     text = player.getInitials(),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    style = MaterialTheme.typography.caption,
                     color = Color(Colors.PRIMARY_TEXT)
                 )
             }
         }
-        Spacer(Modifier.height(2.dp))
-        Text(
-            modifier = Modifier.basicMarquee(),
-            text = player.getDisplayName(),
-            fontSize = 12.sp,
-            color = Color(Colors.PRIMARY_TEXT)
-        )
+//        Spacer(Modifier.height(2.dp))
+//        Text(
+//            modifier = Modifier.basicMarquee(),
+//            text = player.getDisplayName(),
+//            style = MaterialTheme.typography.subtitle2,
+//            fontSize = 12.sp,
+//            color = Color(Colors.PRIMARY_TEXT)
+//        )
     }
 }

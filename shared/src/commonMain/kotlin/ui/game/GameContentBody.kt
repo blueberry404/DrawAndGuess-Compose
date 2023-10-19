@@ -112,15 +112,14 @@ fun GameContentCurrentUserChoosing(modifier: Modifier = Modifier, state: GameSta
         Image(painterResource(Images.PENCIL), "", Modifier.size(48.dp))
         Spacer(Modifier.height(48.dp))
         Text(
-            text = "Time to draw:",
-            fontSize = 24.sp,
+            text = "Time to draw",
+            style = MaterialTheme.typography.h5,
             color = Color(Colors.PRIMARY_TEXT)
         )
         Spacer(Modifier.height(8.dp))
         Text(
             text = state.word.actual.uppercase(),
-            fontSize = 42.sp,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.h3,
             color = Color(Colors.BACKGROUND_YELLOW)
         )
     }
@@ -140,14 +139,13 @@ fun GameContentOtherUserChoosing(modifier: Modifier = Modifier, state: GameState
         Spacer(Modifier.height(48.dp))
         Text(
             text = state.currentUsername,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.h4,
             color = Color(Colors.PRIMARY_TEXT)
         )
         Spacer(Modifier.height(8.dp))
         Text(
             text = "is thinking about word",
-            fontSize = 16.sp,
+            style = MaterialTheme.typography.subtitle1,
             color = Color(Colors.PRIMARY_TEXT)
         )
     }
@@ -283,7 +281,7 @@ fun WordBlocks(modifier: Modifier, word: GameWord, onAnimationCompleted: () -> U
                 ) {
                     Text(
                         text = if (index > word.guessed.length - 1) "" else word.guessed[index].toString(),
-                        fontSize = 24.sp,
+                        style = MaterialTheme.typography.h5,
                         fontWeight = FontWeight.Bold,
                         color = Color(Colors.PRIMARY_TEXT),
                     )
@@ -300,9 +298,10 @@ fun GameStartViewContainer(modifier: Modifier, startGame: () -> Unit) {
             modifier = Modifier.size(200.dp),
             strokeWidth = 16.dp.toPx(),
             colors = arrayOf(
-                Color(Colors.COUNTDOWN_COLOR_1), Color(Colors.COUNTDOWN_COLOR_2), Color(
-                    Colors.COUNTDOWN_COLOR_3
-                ), Color(Colors.COUNTDOWN_COLOR_4)
+                Color(Colors.COUNTDOWN_COLOR_1),
+                Color(Colors.COUNTDOWN_COLOR_2),
+                Color(Colors.COUNTDOWN_COLOR_3),
+                Color(Colors.COUNTDOWN_COLOR_4)
             ),
             textSize = 64.sp,
         ) { startGame() }
@@ -318,13 +317,22 @@ fun GameOverViewContainer(modifier: Modifier, state: GameState) {
     ) {
         Text(
             state.gameOverMessage,
-            color = Color.White,
-            style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold),
+            color = Color(Colors.TEXT_COLOR_YELLOW),
+            style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.Bold),
             textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(64.dp))
-        Text("The word was:", fontSize = 18.sp, color = Color.White)
+        Text(
+            "The word was",
+            style = MaterialTheme.typography.subtitle1,
+            fontSize = 18.sp,
+            color = Color.White
+        )
         Spacer(Modifier.height(8.dp))
-        Text(state.word.actual, fontSize = 28.sp, color = Color.White)
+        Text(
+            state.word.actual,
+            style = MaterialTheme.typography.h3,
+            color = Color.White
+        )
     }
 }
