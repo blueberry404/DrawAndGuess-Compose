@@ -23,7 +23,7 @@ import core.animations.bounceClick
 @Composable
 fun DAGButton(modifier: Modifier, title: String, onClick: () -> Unit) {
     Box(
-        modifier.bounceClick().background(
+        modifier.bounceClick(onClick).background(
             color = Color(Colors.BUTTON_BOTTOM),
             shape = RoundedCornerShape(corner = CornerSize(8.dp))
         )
@@ -36,7 +36,7 @@ fun DAGButton(modifier: Modifier, title: String, onClick: () -> Unit) {
                 width = 1.dp,
                 color = Color(Colors.BUTTON_BORDER),
                 shape = RoundedCornerShape(corner = CornerSize(8.dp))
-            ).clickable { onClick() },
+            ),
         contentAlignment = Alignment.Center,
     ) {
         Text(

@@ -120,7 +120,7 @@ fun GameOptionsSection(createRoom: (GameMode) -> Unit, joinRoomClicked: () -> Un
 @Composable
 fun GameOptionsCard1(createRoom: (GameMode) -> Unit) {
     Box(
-        modifier = Modifier.bounceClick().padding(32.dp).background(
+        modifier = Modifier.bounceClick { createRoom(Single) }.padding(32.dp).background(
             brush = Brush.verticalGradient(
                 listOf(
                     Color(Colors.HOME_CARD1_GRADIENT1),
@@ -130,7 +130,7 @@ fun GameOptionsCard1(createRoom: (GameMode) -> Unit) {
             ),
             shape = RoundedCornerShape(8.dp)
         )
-            .fillMaxWidth().clickable { createRoom(Single) }
+            .fillMaxWidth()
     ) {
         Box(modifier = Modifier.wrapContentHeight()) {
             Image(
@@ -148,7 +148,7 @@ fun GameOptionsCard1(createRoom: (GameMode) -> Unit) {
 @Composable
 fun GameOptionsCard2(createRoom: (GameMode) -> Unit) {
     Box(
-        modifier = Modifier.bounceClick().padding(32.dp).background(
+        modifier = Modifier.bounceClick { createRoom(Many) }.padding(32.dp).background(
             brush = Brush.verticalGradient(
                 listOf(
                     Color(Colors.HOME_CARD2_GRADIENT1),
@@ -158,7 +158,7 @@ fun GameOptionsCard2(createRoom: (GameMode) -> Unit) {
             ),
             shape = RoundedCornerShape(8.dp)
         )
-            .fillMaxWidth().clickable { createRoom(Many) }
+            .fillMaxWidth()
     ) {
         Box(modifier = Modifier.wrapContentHeight()) {
             Image(
@@ -197,7 +197,7 @@ fun CardText(text1: String, text2: String) {
 @Composable
 fun JoinTeamCard(joinRoomClicked: () -> Unit) {
     Box(
-        modifier = Modifier.bounceClick().padding(32.dp).background(
+        modifier = Modifier.bounceClick { joinRoomClicked() }.padding(32.dp).background(
             brush = Brush.verticalGradient(
                 listOf(
                     Color(Colors.HOME_JOIN_TEAM_GRADIENT1),
@@ -209,7 +209,6 @@ fun JoinTeamCard(joinRoomClicked: () -> Unit) {
             .fillMaxWidth()
             .defaultMinSize(minHeight = 60.dp)
             .wrapContentHeight()
-            .clickable { joinRoomClicked() }
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
