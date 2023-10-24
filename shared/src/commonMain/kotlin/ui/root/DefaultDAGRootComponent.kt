@@ -5,6 +5,7 @@ import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.popWhile
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.parcelable.Parcelable
@@ -23,6 +24,10 @@ import ui.root.DAGRootComponent.DAGChild.WaitingRoomChild
 import ui.root.DefaultDAGRootComponent.Config.CreateRoom
 import ui.root.DefaultDAGRootComponent.Config.WaitingRoom
 import ui.createroom.DefaultCreateRoomComponent
+import ui.endgame.DefaultEndGameComponent
+import ui.root.DAGRootComponent.DAGChild.EndGameChild
+import ui.root.DefaultDAGRootComponent.Config.EndGame
+import ui.root.DefaultDAGRootComponent.Config.Home
 import ui.waitingroom.DefaultWaitingRoomComponent
 
 class DefaultDAGRootComponent(
@@ -57,6 +62,7 @@ class DefaultDAGRootComponent(
                 )
             )
             is Config.Game -> GameChild(getGameComponent(componentContext))
+            is Config.EndGame -> EndGameChild(getEndGameComponent(componentContext))
         }
 
     private fun getHomeComponent(componentContext: ComponentContext) =
@@ -83,7 +89,14 @@ class DefaultDAGRootComponent(
         })
 
     private fun getGameComponent(componentContext: ComponentContext) =
-        DefaultGameComponent(componentContext, Dispatchers.Main)
+        DefaultGameComponent(componentContext, Dispatchers.Main) {
+            navigation.push(Config.EndGame)
+        }
+
+    private fun getEndGameComponent(componentContext: ComponentContext) =
+        DefaultEndGameComponent(componentContext) {
+            navigation.popWhile { it != Home }
+        }
 
     @Parcelize
     private sealed interface Config : Parcelable {
@@ -91,5 +104,6 @@ class DefaultDAGRootComponent(
         data class CreateRoom(val gameMode: GameMode, val roomMode: RoomContentMode) : Config
         object WaitingRoom : Config
         object Game: Config
+        object EndGame: Config
     }
 }

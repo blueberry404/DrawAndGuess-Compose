@@ -72,6 +72,7 @@ interface GameComponent {
 class DefaultGameComponent(
     componentContext: ComponentContext,
     coroutineContext: CoroutineContext,
+    private val navigateToEnd: () -> Unit,
 ) : GameComponent, ComponentContext by componentContext, SocketEventsListener, KoinComponent {
 
     private var _uiState = MutableStateFlow(GameState())
