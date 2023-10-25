@@ -6,6 +6,45 @@ import com.arkivanov.essenty.backhandler.BackCallback
 import com.arkivanov.essenty.lifecycle.subscribe
 import core.CountDownTimer
 import core.GlobalData
+import io.github.aakira.napier.Napier
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import models.Player
+import models.Room
+import models.RoomUser
+import models.User
+import network.DAGRepository
+import network.Resource
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import sockets.SocketEvent
+import sockets.SocketEvent.NextRound
+import sockets.SocketEvent.NextTurn
+import sockets.SocketEvent.StartGame
+import sockets.SocketEvent.SyncDrawing
+import sockets.SocketEvent.TurnOver
+import sockets.SocketEventsListener
+import sockets.SocketManager
+import sockets.SocketManager.KEY_CORRECT_GUESS
+import sockets.SocketManager.KEY_END_GAME
+import sockets.SocketManager.KEY_END_ROUND
+import sockets.SocketManager.KEY_END_TURN
+import sockets.SocketManager.KEY_NEXT_ROUND
+import sockets.SocketManager.KEY_NEXT_TURN
+import sockets.SocketManager.KEY_START_GAME
+import sockets.SocketManager.KEY_WRONG_GUESS
+import ui.game.models.CanvasPolygon
+import ui.game.models.CanvasState
+import ui.game.models.DrawingInfo
+import ui.game.models.GameIntent
 import ui.game.models.GameIntent.ClearCanvas
 import ui.game.models.GameIntent.Erase
 import ui.game.models.GameIntent.GameStart
@@ -18,48 +57,13 @@ import ui.game.models.GameIntent.SelectStrokeWidth
 import ui.game.models.GameIntent.StateRestoreCompleted
 import ui.game.models.GameIntent.Undo
 import ui.game.models.GameIntent.WiggleAnimationCompleted
-import ui.game.models.RoundState.Choosing
-import ui.game.models.RoundState.Drawing
-import ui.game.models.RoundState.Starting
-import ui.game.models.CanvasPolygon
-import ui.game.models.CanvasState
-import ui.game.models.DrawingInfo
-import ui.game.models.GameIntent
 import ui.game.models.GameState
 import ui.game.models.GameWord
-import ui.game.models.RoundState
+import ui.game.models.TurnState
+import ui.game.models.TurnState.Choosing
+import ui.game.models.TurnState.Drawing
+import ui.game.models.TurnState.Starting
 import ui.game.undo.CanvasCommand
-import models.Player
-import io.github.aakira.napier.Napier
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import models.Room
-import models.RoomUser
-import network.DAGRepository
-import network.Resource
-import models.User
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import sockets.SocketEvent
-import sockets.SocketEvent.NewRound
-import sockets.SocketEvent.RoundOver
-import sockets.SocketEvent.StartGame
-import sockets.SocketEvent.SyncDrawing
-import sockets.SocketEventsListener
-import sockets.SocketManager
-import sockets.SocketManager.KEY_CORRECT_GUESS
-import sockets.SocketManager.KEY_END_GAME
-import sockets.SocketManager.KEY_NEW_ROUND
-import sockets.SocketManager.KEY_START_GAME
-import sockets.SocketManager.KEY_WRONG_GUESS
 import kotlin.coroutines.CoroutineContext
 
 interface GameComponent {
@@ -93,9 +97,10 @@ class DefaultGameComponent(
     private val scope = CoroutineScope(coroutineContext)
     private var userTurn: RoomUser = RoomUser()
     private var currentRound = 1
+    private var currentTurn = 1
     private var totalRounds = 1
     private var roomInfo = Room()
-    private var words: List<String> = emptyList()
+    private var words: List<List<String>> = emptyList()
     private lateinit var countDownTimer: CountDownTimer
     private var syncJob: Job? = null
     private lateinit var user: User
@@ -159,19 +164,23 @@ class DefaultGameComponent(
             Erase -> {}
             StateRestoreCompleted -> _uiState.update { it.copy(forceRestoreState = false) }
             GameStart -> {
-                _uiState.update { it.copy(roundState = Drawing) }
+                _uiState.update { it.copy(turnState = Drawing) }
                 startJobForCanvasSync()
             }
             GameIntent.TimeOver -> {
                 _uiState.update {
                     it.copy(
-                        roundState = RoundState.TimeOver,
+                        turnState = TurnState.TimeOver,
                         gameOverMessage = "Time's up!!"
                     )
                 }
                 syncJob?.cancel()
                 if (roomInfo.isAdmin) {
-                    SocketManager.signalForGame(KEY_END_GAME)
+                    if (currentTurn == roomInfo.users.size) {
+                        SocketManager.signalForGame(KEY_END_TURN)
+                    } else if (currentRound == totalRounds) {
+                        SocketManager.signalForGame(KEY_END_ROUND)
+                    }
                 }
             }
         }
@@ -192,7 +201,7 @@ class DefaultGameComponent(
             _uiState.update {
                 it.copy(
                     word = GameWord(word.actual, guessed),
-                    roundState = RoundState.Ended,
+                    turnState = TurnState.Ended,
                     gameOverMessage = "You guessed the word!"
                 )
             }
@@ -245,11 +254,11 @@ class DefaultGameComponent(
             val response = repository.getRoom(GlobalData.room.id)
             if (response is Resource.Success) {
                 roomInfo = response.data
-                userTurn = roomInfo.users[currentRound - 1]
+                userTurn = roomInfo.users[currentTurn - 1]
                 totalRounds = roomInfo.gameRounds
                 words = roomInfo.words
                 val currentWord =
-                    if (words.isNotEmpty()) words[0] else throw IllegalStateException("There should be some word")
+                    if (words.isNotEmpty()) words[0][0] else throw IllegalStateException("There should be some word")
                 val players = roomInfo.users.map {
                     val color =
                         Color(("ff" + it.avatarColor.removePrefix("#").lowercase()).toLong(16))
@@ -269,7 +278,7 @@ class DefaultGameComponent(
                         currentTurnUserId = userTurn.id,
                         currentUsername = userTurn.username,
                         totalRounds = roomInfo.gameRounds,
-                        roundState = Choosing,
+                        turnState = Choosing,
                         totalTimeInSec = 60,
                         currentTime = 0,
                         word = GameWord(actual = currentWord),
@@ -292,20 +301,33 @@ class DefaultGameComponent(
         }.also { it.start() }
     }
 
-    private fun startTimerForRoundOverDisplay() {
+    private fun startTimerForTurnOverDisplay() {
         syncJob?.cancel()
-        if (!roomInfo.isAdmin) return
 
-        countDownTimer = CountDownTimer(ROUND_OVER_DISPLAY_SECS) {
-            if (it == ROUND_OVER_DISPLAY_SECS) {
-                if (currentRound + 1 > roomInfo.gameRounds) {
-                    //Disconnect
-                } else {
-                    SocketManager.signalForGame(KEY_NEW_ROUND)
+        if (wasLastRound() || roomInfo.isAdmin) {
+            countDownTimer = CountDownTimer(ROUND_OVER_DISPLAY_SECS) {
+                if (it == ROUND_OVER_DISPLAY_SECS) {
+                    checkForNextTurn()
                 }
-            }
-        }.also { it.start() }
+            }.also { it.start() }
+        }
     }
+
+    private fun checkForNextTurn() {
+        if (wasLastRound()) {
+            SocketManager.signalForGame(KEY_END_GAME)
+            SocketManager.disconnect()
+            navigateToEnd()
+
+        } else if (currentTurn == roomInfo.users.size) {
+            SocketManager.signalForGame(KEY_NEXT_ROUND)
+        } else {
+            SocketManager.signalForGame(KEY_NEXT_TURN)
+        }
+    }
+
+    private fun wasLastRound() = currentTurn == roomInfo.users.size &&
+        currentRound == roomInfo.gameRounds
 
     private fun startJobForCanvasSync() {
         syncJob = scope.launch(Dispatchers.Default) {
@@ -334,7 +356,7 @@ class DefaultGameComponent(
         scope.launch(Dispatchers.Main) {
             when (event) {
                 StartGame -> {
-                    _uiState.update { it.copy(roundState = Starting) }
+                    _uiState.update { it.copy(turnState = Starting) }
                 }
                 is SyncDrawing -> {
                     drawingState = event.canvasState
@@ -342,7 +364,7 @@ class DefaultGameComponent(
                         gameState.copy(polygons = event.canvasState.polygons)
                     }
                 }
-                is RoundOver -> {
+                is TurnOver -> {
                     if (event.isWinner != null) {
                         val name: String? = if (event.winnerId == user.id)
                             "You"
@@ -352,7 +374,7 @@ class DefaultGameComponent(
                         if (name != null) {
                             _uiState.update {
                                 it.copy(
-                                    roundState = RoundState.Ended,
+                                    turnState = TurnState.Ended,
                                     gameOverMessage = "$name guessed the word!"
                                 )
                             }
@@ -360,36 +382,46 @@ class DefaultGameComponent(
                     } else {
                         _uiState.update {
                             it.copy(
-                                roundState = RoundState.TimeOver,
+                                turnState = TurnState.TimeOver,
                                 gameOverMessage = "Time's up!!"
                             )
                         }
                     }
-                    startTimerForRoundOverDisplay()
+                    startTimerForTurnOverDisplay()
                 }
-                NewRound -> {
+                NextTurn -> {
+                    currentTurn++
+                    updateUserTurn()
+                }
+                NextRound -> {
+                    countDownTimer.cancel()
                     currentRound++
-                    userTurn = roomInfo.users[currentRound - 1]
-                    val currentWord = words[currentRound - 1]
-                    val isCurrentUser = user.id == userTurn.id
-
-                    _uiState.update {
-                        it.copy(
-                            roundState = Choosing,
-                            isCurrentUser = isCurrentUser,
-                            currentTurnUserId = userTurn.id,
-                            currentUsername = userTurn.username,
-                            currentTime = 0,
-                            word = GameWord(actual = currentWord),
-                            gameOverMessage = "",
-                        )
-                    }
-                    if (isCurrentUser) {
-                        startTimerForChooseWordDisplay()
-                    }
+                    currentTurn = 1
+                    updateUserTurn()
                 }
                 else -> {}
             }
+        }
+    }
+
+    private fun updateUserTurn() {
+        userTurn = roomInfo.users[currentTurn - 1]
+        val currentWord = words[currentRound - 1][currentTurn - 1]
+        val isCurrentUser = user.id == userTurn.id
+
+        _uiState.update {
+            it.copy(
+                turnState = Choosing,
+                isCurrentUser = isCurrentUser,
+                currentTurnUserId = userTurn.id,
+                currentUsername = userTurn.username,
+                currentTime = 0,
+                word = GameWord(actual = currentWord),
+                gameOverMessage = "",
+            )
+        }
+        if (isCurrentUser) {
+            startTimerForChooseWordDisplay()
         }
     }
 

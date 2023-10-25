@@ -20,10 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import core.animations.pressClickEffect
+import core.animations.keyPressEffect
 
 
 val ROW1 = listOf('Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P')
@@ -49,12 +47,12 @@ fun KeyboardRow(modifier: Modifier, letters: List<Char>, onKeyPressed: (Char) ->
                 Box(
                     modifier = Modifier
                         .size(width = if (it == '!') 40.dp else 35.dp, height = 40.dp)
-                        .pressClickEffect()
+                        .keyPressEffect(it, onKeyPressed)
                         .padding(horizontal = 4.dp)
                         .background(
                             Color.White.copy(alpha = 0.7f),
                             RoundedCornerShape(CornerSize(4.dp))
-                        ).clickable { onKeyPressed(it) },
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(

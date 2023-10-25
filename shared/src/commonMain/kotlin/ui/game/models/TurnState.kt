@@ -1,6 +1,6 @@
 package ui.game.models
 
-enum class RoundState {
+enum class TurnState {
     Choosing,
     Starting,
     Drawing,

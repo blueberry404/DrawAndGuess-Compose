@@ -4,11 +4,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import core.serializers.ColorSerializer
 import core.serializers.OffsetSerializer
-import ui.game.models.RoundState.Choosing
-import ui.game.models.RoundState.Drawing
-import ui.game.models.RoundState.Ended
-import ui.game.models.RoundState.Starting
-import ui.game.models.RoundState.TimeOver
+import ui.game.models.TurnState.Choosing
+import ui.game.models.TurnState.Drawing
+import ui.game.models.TurnState.Ended
+import ui.game.models.TurnState.Starting
+import ui.game.models.TurnState.TimeOver
 import models.Player
 import kotlinx.serialization.Serializable
 
@@ -18,7 +18,7 @@ data class GameState(
     val currentTurnUserId: String = "",
     val currentUsername: String = "",
     val totalRounds: Int = 0,
-    val roundState: RoundState = Choosing,
+    val turnState: TurnState = Choosing,
     val totalTimeInSec: Int = 20,
     val currentTime: Int = 0,
     val word: GameWord = GameWord(),
@@ -27,14 +27,14 @@ data class GameState(
     val polygons: List<CanvasPolygon> = mutableListOf(),
     val gameOverMessage: String = "",
 ) {
-    val isDrawing: Boolean = roundState == Drawing
-    val isStarting: Boolean = roundState == Starting
-    val isTimeOver: Boolean = roundState == TimeOver
-    val isGameOver: Boolean = roundState == Ended
-    val isCurrentUserChoosing = isCurrentUser && roundState == Choosing
-    val isOtherUserChoosing = !isCurrentUser && roundState == Choosing
-    val isCurrentUserDrawing = isCurrentUser && roundState == Drawing
-    val isOtherUserDrawing = !isCurrentUser && roundState == Drawing
+    val isDrawing: Boolean = turnState == Drawing
+    val isStarting: Boolean = turnState == Starting
+    val isTimeOver: Boolean = turnState == TimeOver
+    val isGameOver: Boolean = turnState == Ended
+    val isCurrentUserChoosing = isCurrentUser && turnState == Choosing
+    val isOtherUserChoosing = !isCurrentUser && turnState == Choosing
+    val isCurrentUserDrawing = isCurrentUser && turnState == Drawing
+    val isOtherUserDrawing = !isCurrentUser && turnState == Drawing
 }
 
 data class GameWord(val actual: String = "", val guessed: String = "", val wiggle: Boolean = false)

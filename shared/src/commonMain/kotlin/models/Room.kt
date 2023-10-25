@@ -11,7 +11,7 @@ data class Room(
     val userTurns: List<String> = emptyList(),
     val isAdmin: Boolean = false,
     val name: String = "",
-    val words: List<String> = emptyList(),
+    val words: List<List<String>> = emptyList(),
 )
 
 data class RoomUser(

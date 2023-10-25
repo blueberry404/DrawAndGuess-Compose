@@ -15,7 +15,7 @@ data class RemoteRoom(
     val userTurns: List<String>,
     val adminId: String,
     val name: String,
-    val words: List<String>,
+    val words: List<List<String>>,
 )
 
 @Serializable
