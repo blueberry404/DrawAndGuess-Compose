@@ -167,7 +167,7 @@ fun GameOptionsCard2(createRoom: (GameMode) -> Unit) {
                 modifier = Modifier.width(120.dp).aspectRatio(1.0f).align(Alignment.TopStart)
                     .offset(y = (-40).dp, x = 16.dp),
             )
-            CardText("Play with Friends", "Challenge upto 5 friends for a quick match")
+            CardText("Play with Friends", "Challenge upto 2 friends for a quick match")
         }
     }
 }

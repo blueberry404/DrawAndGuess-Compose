@@ -9,6 +9,7 @@ data class WaitingRoomState(
     val users: List<WaitingUser> = emptyList(),
     val error: String = "",
     val dialogInfo: DAGDialogInfo = DAGDialogInfo(),
+    val isMultiPlayer: Boolean = false,
 )
 
 data class WaitingUser(val id: String, val name: String, val info: AvatarInfo)

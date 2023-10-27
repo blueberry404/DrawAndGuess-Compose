@@ -106,7 +106,8 @@ class DefaultWaitingRoomComponent(
                     WaitingRoomState(
                         roomName = room.name,
                         users = users,
-                        isLoading = false
+                        isLoading = false,
+                        isMultiPlayer = room.mode == Many
                     )
                 }
                 checkUsers()

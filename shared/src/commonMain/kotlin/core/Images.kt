@@ -10,4 +10,5 @@ object Images {
     const val UNDO = "images/undo.png"
     const val CLEAR = "images/trash.png"
     const val WARNING = "images/warning.png"
+    const val INFO = "images/info.png"
 }

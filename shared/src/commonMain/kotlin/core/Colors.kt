@@ -29,6 +29,7 @@ object Colors {
     const val DIALOG_DULL_BACKGROUND = 0x4D000000
     const val DIALOG_BACKGROUND = 0xffEEEEEE
     const val TEXT_COLOR_YELLOW = 0xFFF6BE00
+    const val BACKGROUND_WAITING_INFO = 0xFF89CFF0
 
     const val PAINT_OLIVE = 0xff808000
     const val PAINT_PURPLE = 0xff800080
