@@ -1,3 +1,5 @@
+import com.blueberry.drawnguess.Dependencies
+
 plugins {
     kotlin("multiplatform")
     id("com.android.application")
@@ -10,7 +12,6 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation(project(":shared"))
-                implementation("io.github.aakira:napier:2.6.1")
             }
         }
     }
@@ -39,9 +40,10 @@ android {
 }
 
 dependencies {
-    implementation("com.arkivanov.decompose:decompose:2.0.0-compose-experimental-alpha-02")
-    implementation("com.arkivanov.decompose:extensions-compose-jetbrains:2.0.0-compose-experimental-alpha-02")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
-    implementation("io.insert-koin:koin-core:3.4.0")
-    implementation("io.insert-koin:koin-android:3.4.0")
+    implementation(Dependencies.Arkivanov.Decompose.decompose)
+    implementation(Dependencies.Arkivanov.Decompose.decomposeExtJb)
+    implementation(Dependencies.Android.coroutine)
+    implementation(Dependencies.Koin.core)
+    implementation(Dependencies.Koin.android)
+    implementation(Dependencies.Tools.napier)
 }

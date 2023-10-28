@@ -1,3 +1,5 @@
+import com.blueberry.drawnguess.Dependencies
+
 plugins {
     kotlin("multiplatform")
     kotlin("native.cocoapods")
@@ -24,19 +26,16 @@ kotlin {
             baseName = "shared"
             isStatic = true
 
-            export("com.arkivanov.decompose:decompose:2.0.0-compose-experimental-alpha-02")
-            export("com.arkivanov.essenty:lifecycle:1.1.0")
-            export("com.arkivanov.essenty:state-keeper:1.1.0")
-            export("com.arkivanov.essenty:instance-keeper:1.1.0")
-            export("com.arkivanov.essenty:back-handler:1.1.0")
+            export(Dependencies.Arkivanov.Decompose.decompose)
+            export(Dependencies.Arkivanov.Essenty.lifecycle)
+            export(Dependencies.Arkivanov.Essenty.stateKeeper)
+            export(Dependencies.Arkivanov.Essenty.instanceKeeper)
+            export(Dependencies.Arkivanov.Essenty.backHandler)
         }
         extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
     }
 
     sourceSets {
-        val ktor = "2.3.0"
-        val koin = "3.4.0"
-
         val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
@@ -45,43 +44,53 @@ kotlin {
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
 
-                val mviKotlin = "3.2.0"
-                implementation("com.arkivanov.mvikotlin:mvikotlin:$mviKotlin")
-                implementation("com.arkivanov.mvikotlin:mvikotlin-main:$mviKotlin")
-                implementation("com.arkivanov.mvikotlin:mvikotlin-logging:$mviKotlin")
-                implementation("com.arkivanov.mvikotlin:mvikotlin-extensions-coroutines:$mviKotlin")
+                with (Dependencies.Arkivanov.MviKotlin) {
+                    implementation(mvi)
+                    implementation(main)
+                    implementation(logging)
+                    implementation(coroutineExt)
+                }
 
-                api("com.arkivanov.decompose:decompose:2.0.0-compose-experimental-alpha-02")
-                api("com.arkivanov.decompose:extensions-compose-jetbrains:2.0.0-compose-experimental-alpha-02")
-                api("com.arkivanov.essenty:lifecycle:1.1.0")
-                api("com.arkivanov.essenty:state-keeper:1.1.0")
-                api("com.arkivanov.essenty:instance-keeper:1.1.0")
-                api("com.arkivanov.essenty:back-handler:1.1.0")
+                with (Dependencies.Arkivanov.Decompose) {
+                    api(decompose)
+                    api(decomposeExtJb)
+                }
 
-                implementation("io.ktor:ktor-client-core:$ktor")
-                implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor")
-                implementation("io.ktor:ktor-client-content-negotiation:$ktor")
-                implementation("io.ktor:ktor-client-logging:$ktor")
+                with (Dependencies.Arkivanov.Essenty) {
+                    api(lifecycle)
+                    api(stateKeeper)
+                    api(instanceKeeper)
+                    api(backHandler)
+                }
 
-                implementation("io.github.aakira:napier:2.6.1")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2")
+                with (Dependencies.Ktor) {
+                    implementation(core)
+                    implementation(serialization)
+                    implementation(contentNegotiation)
+                    implementation(logging)
+                }
 
-                val settings = "1.0.0"
-                implementation("com.russhwolf:multiplatform-settings-no-arg:$settings")
-                implementation("com.russhwolf:multiplatform-settings-serialization:$settings")
-                implementation("com.russhwolf:multiplatform-settings-coroutines:$settings")
+                with (Dependencies.Settings) {
+                    implementation(noArg)
+                    implementation(serialization)
+                    implementation(coroutines)
+                }
 
-                implementation("io.insert-koin:koin-core:$koin")
-                implementation("io.insert-koin:koin-test:$koin")
+                implementation(Dependencies.Tools.napier)
+                implementation(Dependencies.Tools.coroutineCore)
+
+                implementation(Dependencies.Koin.core)
+                implementation(Dependencies.Koin.test)
             }
         }
         val androidMain by getting {
             dependencies {
-                api("androidx.activity:activity-compose:1.6.1")
-                api("androidx.appcompat:appcompat:1.6.1")
-                api("androidx.core:core-ktx:1.9.0")
-                implementation("io.ktor:ktor-client-okhttp:$ktor")
-                implementation("com.squareup.okhttp3:okhttp:4.10.0")
+                with (Dependencies.Android) {
+                    api(activity)
+                    api(appCompat)
+                    api(coreKtx)
+                }
+                implementation(Dependencies.Ktor.okhttp)
             }
         }
         val iosX64Main by getting
@@ -90,8 +99,8 @@ kotlin {
         val iosMain by creating {
             dependsOn(commonMain)
             dependencies {
-                implementation("io.ktor:ktor-client-darwin:$ktor")
-                implementation("io.ktor:ktor-client-ios:$ktor")
+                implementation(Dependencies.Ktor.darwin)
+                implementation(Dependencies.Ktor.ios)
             }
             iosX64Main.dependsOn(this)
             iosArm64Main.dependsOn(this)
