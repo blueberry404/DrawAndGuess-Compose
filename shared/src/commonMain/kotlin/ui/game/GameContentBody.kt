@@ -52,23 +52,17 @@ import ui.game.models.GameState
 import ui.game.models.GameWord
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import ui.game.models.GameIntent
+import ui.game.models.GameIntent.OnDragEnded
+import ui.game.models.GameIntent.OnDragMoved
+import ui.game.models.GameIntent.OnDragStarted
+import ui.game.models.GameIntent.WiggleAnimationCompleted
 
 @Composable
 fun GameBodyContent(
     modifier: Modifier = Modifier,
     state: GameState,
-    onKeyPressed: (Char) -> Unit,
-    onAnimationCompleted: () -> Unit,
-    onColorSelected: (Color) -> Unit,
-    onStrokeWidthSelected: (Float) -> Unit,
-    forceRestored: () -> Unit,
-    onDragStarted: () -> Unit = {},
-    onDragMoved: (Offset) -> Unit = {},
-    onDragEnded: () -> Unit,
-    onUndo: () -> Unit,
-    onErase: () -> Unit,
-    onClear: () -> Unit,
-    startGame: () -> Unit,
+    callback: (GameIntent) -> Unit,
 ) {
     val drawingInfoState = mutableStateOf(state.drawingInfo)
 
@@ -76,26 +70,15 @@ fun GameBodyContent(
         state.isCurrentUserChoosing -> GameContentCurrentUserChoosing(modifier, state)
         state.isOtherUserChoosing -> GameContentOtherUserChoosing(modifier, state)
         state.isCurrentUserDrawing -> GameContentCurrentUserDrawing(
-            modifier,
-            state,
-            onColorSelected = {
-                onColorSelected(it)
-            },
-            onStrokeWidthSelected = {
-                onStrokeWidthSelected(it)
-            },
-            drawingInfo = drawingInfoState.value,
-            forceRestored, onDragStarted, onDragMoved, onDragEnded,
-            onUndo, onErase, onClear
+            modifier, state, drawingInfoState.value, callback
         )
 
         state.isOtherUserDrawing -> GameContentOtherUserDrawing(
             modifier,
             state,
-            onKeyPressed,
-            onAnimationCompleted
+            callback
         )
-        state.isStarting -> GameStartViewContainer(Modifier.fillMaxSize(), startGame)
+        state.isStarting -> GameStartViewContainer(Modifier.fillMaxSize(), callback)
         state.isTimeOver || state.isGameOver -> GameOverViewContainer(Modifier.fillMaxSize(), state)
         else -> {}
     }
@@ -155,15 +138,14 @@ fun GameContentOtherUserChoosing(modifier: Modifier = Modifier, state: GameState
 fun GameContentOtherUserDrawing(
     modifier: Modifier,
     state: GameState,
-    onKeyPressed: (Char) -> Unit,
-    onAnimationCompleted: () -> Unit,
+    callback: (GameIntent) -> Unit,
 ) {
     Column(modifier) {
         DrawingCanvas(Modifier.fillMaxWidth().weight(1f), state)
-        WordBlocks(Modifier.fillMaxWidth(), state.word, onAnimationCompleted)
+        WordBlocks(Modifier.fillMaxWidth(), state.word, callback)
         GameKeyboard(
             Modifier.fillMaxWidth().background(Color(Colors.KEYBOARD_BACKGROUND))
-                .padding(vertical = 8.dp, horizontal = 4.dp), onKeyPressed
+                .padding(vertical = 8.dp, horizontal = 4.dp), callback
         )
     }
 }
@@ -172,25 +154,12 @@ fun GameContentOtherUserDrawing(
 fun GameContentCurrentUserDrawing(
     modifier: Modifier,
     state: GameState,
-    onColorSelected: (Color) -> Unit,
-    onStrokeWidthSelected: (Float) -> Unit,
     drawingInfo: DrawingInfo,
-    forceRestored: () -> Unit,
-    onDragStarted: () -> Unit = {},
-    onDragMoved: (Offset) -> Unit = {},
-    onDragEnded: () -> Unit,
-    onUndo: () -> Unit,
-    onErase: () -> Unit,
-    onClear: () -> Unit,
+    callback: (GameIntent) -> Unit,
 ) {
     Column(modifier) {
-        DrawingCanvas(Modifier.fillMaxWidth().weight(1f), state, drawingInfo, forceRestored, onDragStarted, onDragMoved, onDragEnded)
-        GameToolbox(
-            Modifier.fillMaxWidth().wrapContentHeight(),
-            onColorSelected,
-            onStrokeWidthSelected,
-            onUndo, onErase, onClear
-        )
+        DrawingCanvas(Modifier.fillMaxWidth().weight(1f), state, drawingInfo, callback)
+        GameToolbox(Modifier.fillMaxWidth().wrapContentHeight(), callback)
     }
 }
 
@@ -199,10 +168,7 @@ fun DrawingCanvas(
     modifier: Modifier,
     state: GameState,
     drawingInfo: DrawingInfo = DrawingInfo(),
-    forceRestored: () -> Unit = {},
-    onDragStarted: () -> Unit = {},
-    onDragMoved: (Offset) -> Unit = {},
-    onDragEnded: () -> Unit = {},
+    callback: (GameIntent) -> Unit = {},
 ) {
 
     var pointsState = remember { mutableStateListOf<CanvasPolygon>() }
@@ -213,7 +179,7 @@ fun DrawingCanvas(
             if (state.forceRestoreState) {
                 pointsState.clear()
                 pointsState.addAll(state.polygons)
-                forceRestored()
+                callback(GameIntent.StateRestoreCompleted)
             }
         }
     }
@@ -228,11 +194,11 @@ fun DrawingCanvas(
                         paintColor = info.value.paintColor
                     )
                     pointsState.add(drawingState)
-                    onDragStarted()
-                }, onDragEnd = { onDragEnded() },
+                    callback(OnDragStarted)
+                }, onDragEnd = { callback(OnDragEnded) },
                     onDragCancel = {}, onDrag = { change, _ ->
                         pointsState.last().offsets.add(change.position)
-                        onDragMoved(change.position)
+                        callback(OnDragMoved(change.position))
                     })
             }
         }
@@ -253,7 +219,7 @@ fun DrawingCanvas(
 }
 
 @Composable
-fun WordBlocks(modifier: Modifier, word: GameWord, onAnimationCompleted: () -> Unit) {
+fun WordBlocks(modifier: Modifier, word: GameWord, callback: (GameIntent) -> Unit) {
     BoxWithConstraints(modifier.padding(16.dp)) {
         val offsetX = remember { Animatable(0f) }
 
@@ -263,7 +229,7 @@ fun WordBlocks(modifier: Modifier, word: GameWord, onAnimationCompleted: () -> U
                     targetValue = 0f,
                     animationSpec = shakeKeyframes,
                 )
-                onAnimationCompleted()
+                callback(WiggleAnimationCompleted)
             }
         }
 
@@ -292,7 +258,7 @@ fun WordBlocks(modifier: Modifier, word: GameWord, onAnimationCompleted: () -> U
 }
 
 @Composable
-fun GameStartViewContainer(modifier: Modifier, startGame: () -> Unit) {
+fun GameStartViewContainer(modifier: Modifier, callback: (GameIntent) -> Unit) {
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         GameStartView(
             modifier = Modifier.size(200.dp),
@@ -304,7 +270,7 @@ fun GameStartViewContainer(modifier: Modifier, startGame: () -> Unit) {
                 Color(Colors.COUNTDOWN_COLOR_4)
             ),
             textSize = 64.sp,
-        ) { startGame() }
+        ) { callback(GameIntent.GameStart) }
     }
 }
 

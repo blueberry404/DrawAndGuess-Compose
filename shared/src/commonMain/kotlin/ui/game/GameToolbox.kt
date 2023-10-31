@@ -29,16 +29,18 @@ import core.Images
 import core.extension.toPx
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import ui.game.models.GameIntent
+import ui.game.models.GameIntent.ClearCanvas
+import ui.game.models.GameIntent.Erase
+import ui.game.models.GameIntent.SelectColor
+import ui.game.models.GameIntent.SelectStrokeWidth
+import ui.game.models.GameIntent.Undo
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun GameToolbox(
     modifier: Modifier,
-    onColorSelected: (Color) -> Unit,
-    onStrokeWidthSelected: (Float) -> Unit,
-    onUndo: () -> Unit,
-    onErase: () -> Unit,
-    onClear: () -> Unit,
+    callback: (GameIntent) -> Unit,
 ) {
     Box(modifier.background(Color(Colors.KEYBOARD_BACKGROUND)).padding(16.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -46,26 +48,26 @@ fun GameToolbox(
                 Image(
                     painter = painterResource(Images.UNDO),
                     null,
-                    modifier = Modifier.clickable { onUndo() })
+                    modifier = Modifier.clickable { callback(Undo) })
                 Spacer(Modifier.height(8.dp))
-                Image(
-                    painter = painterResource(Images.ERASER),
-                    null,
-                    modifier = Modifier.clickable { onErase() })
-                Spacer(Modifier.height(8.dp))
+//                Image(
+//                    painter = painterResource(Images.ERASER),
+//                    null,
+//                    modifier = Modifier.clickable { callback(Erase) })
+//                Spacer(Modifier.height(8.dp))
                 Image(
                     painter = painterResource(Images.CLEAR),
                     null,
-                    modifier = Modifier.clickable { onClear() })
+                    modifier = Modifier.clickable { callback(ClearCanvas) })
             }
-            ColorPalette(Modifier, onColorSelected)
-            StrokePalette(Modifier.padding(8.dp), onStrokeWidthSelected)
+            ColorPalette(Modifier, callback)
+            StrokePalette(Modifier.padding(8.dp), callback)
         }
     }
 }
 
 @Composable
-fun ColorPalette(modifier: Modifier, onColorSelected: (Color) -> Unit) {
+fun ColorPalette(modifier: Modifier, callback: (GameIntent) -> Unit) {
     Column(modifier) {
         var row = 0
         while (row < 2) {
@@ -81,7 +83,7 @@ fun ColorPalette(modifier: Modifier, onColorSelected: (Color) -> Unit) {
                             Color(Colors.BORDER_PALETTE_COLOR),
                             shape = RoundedCornerShape(CornerSize(16.dp))
                         )
-                            .clickable { onColorSelected(color) })
+                            .clickable { callback(SelectColor(color)) })
                         Spacer(Modifier.width(8.dp))
                     }
                     row++
@@ -92,7 +94,7 @@ fun ColorPalette(modifier: Modifier, onColorSelected: (Color) -> Unit) {
 }
 
 @Composable
-fun StrokePalette(modifier: Modifier, onStrokeWidthSelected: (Float) -> Unit) {
+fun StrokePalette(modifier: Modifier, callback: (GameIntent) -> Unit) {
     val strokeWidths = remember {
         listOf(4.dp, 8.dp, 16.dp)
     }
@@ -114,7 +116,7 @@ fun StrokePalette(modifier: Modifier, onStrokeWidthSelected: (Float) -> Unit) {
                     ),
                 )
                 drawCircle(color = Color(Colors.BORDER_PALETTE_COLOR), radius = dp.toPx() / 2)
-            }.clickable { onStrokeWidthSelected(pixel) })
+            }.clickable { callback(SelectStrokeWidth(pixel)) })
             Spacer(Modifier.height(8.dp))
         }
     }

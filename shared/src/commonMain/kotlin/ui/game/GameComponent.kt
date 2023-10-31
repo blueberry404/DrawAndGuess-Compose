@@ -125,6 +125,54 @@ class DefaultGameComponent(
         })
     }
 
+    private fun getRoomInfo() {
+        scope.launch {
+            val userResponse = repository.getUser()
+            check(userResponse is Resource.Success)
+            user = userResponse.data
+
+            val response = repository.getRoom(GlobalData.room.id)
+            if (response is Resource.Success) {
+                roomInfo = response.data
+                userTurn = roomInfo.users[currentTurn - 1]
+                totalRounds = roomInfo.gameRounds
+                words = roomInfo.words
+                val currentWord =
+                    if (words.isNotEmpty()) words[0][0] else throw IllegalStateException("There should be some word")
+                val players = roomInfo.users.map {
+                    val color =
+                        Color(("ff" + it.avatarColor.removePrefix("#").lowercase()).toLong(16))
+                    Player(
+                        id = it.id,
+                        name = it.username,
+                        score = 0,
+                        isDrawing = false,
+                        isCurrentUser = false,
+                        color = color
+                    )
+                }
+                _uiState.update {
+                    GameState(
+                        players = players,
+                        isCurrentUser = user.id == userTurn.id,
+                        currentTurnUserId = userTurn.id,
+                        currentUsername = userTurn.username,
+                        totalRounds = roomInfo.gameRounds,
+                        turnState = Choosing,
+                        totalTimeInSec = 60,
+                        currentTime = 0,
+                        word = GameWord(actual = currentWord),
+                    )
+                }
+                if (_uiState.value.isCurrentUserChoosing) {
+                    startTimerForChooseWordDisplay()
+                }
+            } else {
+                Napier.e { "An error occured" }
+            }
+        }
+    }
+
     private fun handleIntent(intent: GameIntent) {
         when (intent) {
             is SelectLetter -> checkGuessedWord(intent.letter)
@@ -186,6 +234,9 @@ class DefaultGameComponent(
         }
     }
 
+
+    //////////////////////////// GUESSED WORD ////////////////////////////
+
     private fun checkGuessedWord(letter: Char) {
         val word = _uiState.value.word
         if (letter == '!' && word.guessed.isEmpty()) return
@@ -218,6 +269,8 @@ class DefaultGameComponent(
     private fun isWrongGuess(actual: String, guessed: String) =
         actual.length == guessed.length && actual.lowercase() != guessed.lowercase()
 
+    //////////////////////////// CANVAS ////////////////////////////
+
     private fun saveSnapshot() {
         canvasCommand.save(drawingState.polygons.last())
     }
@@ -245,53 +298,19 @@ class DefaultGameComponent(
         _uiState.update { it.copy(forceRestoreState = true, polygons = emptyList()) }
     }
 
-    private fun getRoomInfo() {
-        scope.launch {
-            val userResponse = repository.getUser()
-            check(userResponse is Resource.Success)
-            user = userResponse.data
-
-            val response = repository.getRoom(GlobalData.room.id)
-            if (response is Resource.Success) {
-                roomInfo = response.data
-                userTurn = roomInfo.users[currentTurn - 1]
-                totalRounds = roomInfo.gameRounds
-                words = roomInfo.words
-                val currentWord =
-                    if (words.isNotEmpty()) words[0][0] else throw IllegalStateException("There should be some word")
-                val players = roomInfo.users.map {
-                    val color =
-                        Color(("ff" + it.avatarColor.removePrefix("#").lowercase()).toLong(16))
-                    Player(
-                        id = it.id,
-                        name = it.username,
-                        score = 0,
-                        isDrawing = false,
-                        isCurrentUser = false,
-                        color = color
-                    )
+    private fun startJobForCanvasSync() {
+        syncJob = scope.launch(Dispatchers.Default) {
+            while (_uiState.value.isCurrentUserDrawing) {
+                canvasCommand.peek()?.let {
+                    SocketManager.syncCanvas(it)
                 }
-                _uiState.update {
-                    GameState(
-                        players = players,
-                        isCurrentUser = user.id == userTurn.id,
-                        currentTurnUserId = userTurn.id,
-                        currentUsername = userTurn.username,
-                        totalRounds = roomInfo.gameRounds,
-                        turnState = Choosing,
-                        totalTimeInSec = 60,
-                        currentTime = 0,
-                        word = GameWord(actual = currentWord),
-                    )
-                }
-              if (_uiState.value.isCurrentUserChoosing) {
-                  startTimerForChooseWordDisplay()
-              }
-            } else {
-                Napier.e { "An error occured" }
+                delay(700)
             }
         }
     }
+
+
+    //////////////////////////// MANAGE ROUNDS ////////////////////////////
 
     private fun startTimerForChooseWordDisplay() {
         countDownTimer = CountDownTimer(CHOOSE_DISPLAY_SECS) {
@@ -329,23 +348,35 @@ class DefaultGameComponent(
     private fun wasLastRound() = currentTurn == roomInfo.users.size &&
         currentRound == roomInfo.gameRounds
 
-    private fun startJobForCanvasSync() {
-        syncJob = scope.launch(Dispatchers.Default) {
-            while (_uiState.value.isCurrentUserDrawing) {
-                canvasCommand.peek()?.let {
-                    SocketManager.syncCanvas(it)
-                }
-                delay(700)
-            }
+    private fun updateUserTurn() {
+        userTurn = roomInfo.users[currentTurn - 1]
+        val currentWord = words[currentRound - 1][currentTurn - 1]
+        val isCurrentUser = user.id == userTurn.id
+
+        _uiState.update {
+            it.copy(
+                turnState = Choosing,
+                isCurrentUser = isCurrentUser,
+                currentTurnUserId = userTurn.id,
+                currentUsername = userTurn.username,
+                currentTime = 0,
+                word = GameWord(actual = currentWord),
+                gameOverMessage = "",
+            )
+        }
+        if (isCurrentUser) {
+            startTimerForChooseWordDisplay()
         }
     }
 
+    //////////////////////////// SOCKETS ////////////////////////////
+
     override fun onConnected() {
-        TODO("Not yet implemented")
+
     }
 
     override fun onDisconnected() {
-        TODO("Not yet implemented")
+
     }
 
     override fun onFailure(reason: String) {
@@ -401,27 +432,6 @@ class DefaultGameComponent(
                 }
                 else -> {}
             }
-        }
-    }
-
-    private fun updateUserTurn() {
-        userTurn = roomInfo.users[currentTurn - 1]
-        val currentWord = words[currentRound - 1][currentTurn - 1]
-        val isCurrentUser = user.id == userTurn.id
-
-        _uiState.update {
-            it.copy(
-                turnState = Choosing,
-                isCurrentUser = isCurrentUser,
-                currentTurnUserId = userTurn.id,
-                currentUsername = userTurn.username,
-                currentTime = 0,
-                word = GameWord(actual = currentWord),
-                gameOverMessage = "",
-            )
-        }
-        if (isCurrentUser) {
-            startTimerForChooseWordDisplay()
         }
     }
 

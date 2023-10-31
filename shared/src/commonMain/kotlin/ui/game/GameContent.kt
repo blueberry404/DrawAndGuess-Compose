@@ -17,19 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import core.Colors
 import core.extension.toPx
-import ui.game.models.GameIntent.ClearCanvas
-import ui.game.models.GameIntent.Erase
-import ui.game.models.GameIntent.GameStart
-import ui.game.models.GameIntent.OnDragEnded
-import ui.game.models.GameIntent.OnDragMoved
-import ui.game.models.GameIntent.OnDragStarted
-import ui.game.models.GameIntent.SelectColor
-import ui.game.models.GameIntent.SelectLetter
-import ui.game.models.GameIntent.SelectStrokeWidth
-import ui.game.models.GameIntent.StateRestoreCompleted
 import ui.game.models.GameIntent.TimeOver
-import ui.game.models.GameIntent.Undo
-import ui.game.models.GameIntent.WiggleAnimationCompleted
 import ui.game.models.GameState
 import ui.home.HomeHeader
 
@@ -45,7 +33,7 @@ fun GameContent(component: GameComponent, modifier: Modifier) {
             }
             Column(Modifier.zIndex(-1f)) {
                 Spacer(Modifier.height(45.dp))
-                GameBody(component, state)
+                GameBodyContent(Modifier.fillMaxSize(), state, component::onIntent)
             }
         }
         else {
@@ -56,31 +44,10 @@ fun GameContent(component: GameComponent, modifier: Modifier) {
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                GameBody(component, state)
+                GameBodyContent(Modifier.fillMaxSize(), state, component::onIntent)
             }
         }
     }
-}
-
-@Composable
-fun GameBody(component: GameComponent, state: GameState) {
-    GameBodyContent(Modifier.fillMaxSize(), state, onKeyPressed = {
-        component.onIntent(SelectLetter(it))
-    }, onAnimationCompleted = {
-        component.onIntent(WiggleAnimationCompleted)
-    }, onColorSelected = {
-        component.onIntent(SelectColor(it))
-    }, onStrokeWidthSelected = {
-        component.onIntent(SelectStrokeWidth(it))
-    }, forceRestored = {
-        component.onIntent(StateRestoreCompleted)
-    }, onDragStarted = { component.onIntent(OnDragStarted) },
-        onDragMoved = { component.onIntent(OnDragMoved(it)) },
-        onDragEnded = { component.onIntent(OnDragEnded) },
-    onUndo = { component.onIntent(Undo) },
-    onClear = { component.onIntent(ClearCanvas) },
-    onErase = { component.onIntent(Erase) },
-    startGame = { component.onIntent(GameStart) })
 }
 
 @Composable

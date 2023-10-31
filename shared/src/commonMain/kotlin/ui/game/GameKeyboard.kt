@@ -22,6 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import core.animations.keyPressEffect
+import ui.game.models.GameIntent
+import ui.game.models.GameIntent.SelectLetter
 
 
 val ROW1 = listOf('Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P')
@@ -29,25 +31,27 @@ val ROW2 = listOf('A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L')
 val ROW3 = listOf('Z', 'X', 'C', 'V', 'B', 'N', 'M', '!')
 
 @Composable
-fun GameKeyboard(modifier: Modifier, onKeyPressed: (Char) -> Unit) {
+fun GameKeyboard(modifier: Modifier, callback: (GameIntent) -> Unit) {
     Column(modifier) {
-        KeyboardRow(Modifier.fillMaxWidth(), ROW1, onKeyPressed)
+        KeyboardRow(Modifier.fillMaxWidth(), ROW1, callback)
         Spacer(Modifier.height(6.dp))
-        KeyboardRow(Modifier.fillMaxWidth(), ROW2, onKeyPressed)
+        KeyboardRow(Modifier.fillMaxWidth(), ROW2, callback)
         Spacer(Modifier.height(6.dp))
-        KeyboardRow(Modifier.fillMaxWidth(), ROW3, onKeyPressed)
+        KeyboardRow(Modifier.fillMaxWidth(), ROW3, callback)
     }
 }
 
 @Composable
-fun KeyboardRow(modifier: Modifier, letters: List<Char>, onKeyPressed: (Char) -> Unit) {
+fun KeyboardRow(modifier: Modifier, letters: List<Char>, callback: (GameIntent) -> Unit) {
     BoxWithConstraints(modifier) {
         LazyRow(modifier = Modifier.align(Alignment.Center)) {
             items(letters) {
                 Box(
                     modifier = Modifier
                         .size(width = if (it == '!') 40.dp else 35.dp, height = 40.dp)
-                        .keyPressEffect(it, onKeyPressed)
+                        .keyPressEffect(it) { ch ->
+                            callback(SelectLetter(ch))
+                        }
                         .padding(horizontal = 4.dp)
                         .background(
                             Color.White.copy(alpha = 0.7f),
