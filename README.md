@@ -5,11 +5,11 @@ BE has been hosted on Heroku, feel free to play on your devices/simulators. If y
 
 ## Screenshots
 
-<img width="748" alt="Screenshot 2023-11-01 at 10 29 03 PM" src="https://github.com/blueberry404/DrawAndGuess-Compose/assets/39243539/7777f53a-ae3d-4d69-8bdb-cc0f4b2edbf5">
+<img width="748" alt="Screenshot 2023-11-01 at 10 29 03 PM" src="https://github.com/blueberry404/DrawAndGuess-Compose/assets/39243539/afb78f89-4993-498d-a4cc-2fb142bac55a">
 
-<img width="733" alt="Screenshot 2023-11-01 at 10 34 29 PM" src="https://github.com/blueberry404/DrawAndGuess-Compose/assets/39243539/e8f2ce60-279b-463f-b8f7-40ac9f838020">
+<img width="710" alt="Screenshot 2023-11-01 at 10 31 18 PM" src="https://github.com/blueberry404/DrawAndGuess-Compose/assets/39243539/6908bf5b-91eb-44eb-8ab8-07e4af2df88f">
 
-<img width="742" alt="Screenshot 2023-11-01 at 10 33 32 PM" src="https://github.com/blueberry404/DrawAndGuess-Compose/assets/39243539/ec71143c-6362-4ad2-a6b8-76d9be5454f2">
+<img width="748" alt="Screenshot 2023-11-01 at 11 04 14 PM" src="https://github.com/blueberry404/DrawAndGuess-Compose/assets/39243539/24390afb-5c18-4b45-85e9-95ddee795cdf">
 
 
 ## Libraries Used
@@ -21,6 +21,7 @@ BE has been hosted on Heroku, feel free to play on your devices/simulators. If y
 
 ## Improvements Needed
 - Accurate synchronization of events between players.
+- Canvas drawing should have compatible mapping across different device sizes.
 - More robust error handling - since sockets have loads of cases to manage. I have focused on happy flows and handled disconnectivity issues.
 - Use a design pattern like MVI
 
